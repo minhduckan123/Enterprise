@@ -1,7 +1,7 @@
 const {MongoClient,ObjectId} = require('mongodb')
 
 const DATABASE_URL = "mongodb+srv://hieunt:EarthDefender@cluster0.vwoqw.mongodb.net/test"
-const DATABASE_NAME = 'myDatabase'
+const DATABASE_NAME = 'Enterprise'
 
 async function getDB() {
     const client = await MongoClient.connect(DATABASE_URL);
@@ -31,4 +31,17 @@ async function getDocumentById(id, collectionName){
     return result;
 }
 
-module.exports = {deleteObject, insertObject,updateDocument, getDocumentById}
+async function getDocument(collectionName){
+    const dbo = await getDB()
+    const results = await dbo.collection(collectionName).find({}).toArray();
+    return results;
+}
+
+async function getCommentByIdea(id, collectionName){
+    const dbo = await getDB()
+    const result = await dbo.collection(collectionName).find({idea:id}).toArray();
+    return result;
+}
+
+module.exports = {deleteObject, insertObject,updateDocument, getDocumentById, getDocument,
+    getCommentByIdea}

@@ -1,9 +1,17 @@
 const express = require('express')
-const { insertObject, updateDocument, deleteObject, getDocumentById} = require('../model/databaseControl')
+const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument} = require('../model/databaseControl')
 const router = express.Router()
 
 router.get('/users', async (req, res) => {
-    res.render('users')
+    const users = await getDocument("Users")
+    console.log({model:users})
+    res.render('users',{model:users})
+})
+
+router.get('/users/:id', async (req, res) => {
+    const idValue = req.params.id
+    const user = await getDocumentById(idValue, "Users")
+    res.render('users',{model:user})
 })
 
 router.get('/addUser',(req,res)=>{
@@ -17,7 +25,7 @@ router.get('/deleteUser/:id', async (req, res) => {
 })
 
 router.post('/addUser',async (req,res)=>{
-    const name = req.body.txtname
+    const name = req.body.txtName
     const pass = req.body.txtPass
     const role = req.body.txtRole
     const email = req.body.txtEmail
@@ -28,6 +36,19 @@ router.post('/addUser',async (req,res)=>{
         email: email,
     }
     await insertObject("Users", objectToInsert)
+    res.redirect('/admin/users')
+})
+
+router.post('/addCourse',async (req,res)=>{
+    const name = req.body.txtName
+    const deadline1 = req.body.txtDL1
+    const deadline2 = req.body.txtDL2
+    const objectToInsert = {
+        courseName: name,
+        deadLine1: deadline1,
+        deadLine2: deadline2,
+    }
+    await insertObject("Course", objectToInsert)
     res.redirect('/admin/users')
 })
 

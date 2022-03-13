@@ -43,5 +43,5 @@ async function getCommentByIdea(id, collectionName){
     return result;
 }
 
-module.exports = {deleteObject, insertObject,updateDocument, getDocumentById, getDocument,
+module.exports = { getDB, deleteObject, insertObject,updateDocument, getDocumentById, getDocument,
     getCommentByIdea}

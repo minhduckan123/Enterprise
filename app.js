@@ -11,17 +11,24 @@ app.use(express.static(publicDir));
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended:false}))
 
-app.get('/',async (req,res)=>{
-    res.render('home')
-})
+var cookieParser = require('cookie-parser')
+app.use(cookieParser('abc9d$67#sdvdJisY'))
+
+var authMiddleware = require("./middleware/auth.middleware")
 
 app.get('/adminIndex', async (req, res) => {
     res.render('adminIndex')
 })
 
+const loginController = require('./controller/login')
+app.use('/login',  loginController)
+
+// app.get('/',async (req,res)=>{
+//     res.render('home')
+// })
 
 const adminController = require('./controller/admin')
-app.use('/admin', adminController)
+app.use('/admin',authMiddleware.authLogIn, adminController)
 
 const commentController = require('./controller/comment')
 app.use('/comment', commentController)
@@ -34,6 +41,7 @@ app.use('/email', emailController)
 
 const staffController = require('./controller/staff')
 app.use('/staff', staffController)
+
 
 
 var PORT = process.env.PORT || 5000

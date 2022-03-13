@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<title>Login In</title>
+<head>
+	<link rel="stylesheet" href="/css/login.css">
+</head>
+<body>	
+	<div class="loginbox">
+        <img src="/img/avatar.png" class="avatar"> 
+        <h1>Login</h1>
+        <form method="POST" action="/login/doLogin">
+            <p>Username/Emails</p>
+            <input type="text" name="username" placeholder="Enter Username/Emails" required>
+            <p>Password</p>
+            <input type="Password" name="password" placeholder="Enter Password" required>
+            <input type="submit" name="login" value="Login">
+            <span style="color: red;">{{message}}</span>
+            <a href="#">Dont have a account?</a>
+        </form>
+	</div> 
+</body>
+</html>

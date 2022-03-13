@@ -27,13 +27,16 @@ const commentController = require('./controller/comment')
 app.use('/comment', commentController)
 
 const ideaController = require('./controller/idea')
-app.use('/comment', ideaController)
+app.use('/idea', ideaController)
 
 const emailController = require('./controller/email')
 app.use('/email', emailController)
 
 const staffController = require('./controller/staff')
 app.use('/staff', staffController)
+
+const qamController = require('./controller/qam')
+app.use('/qam', qamController)
 
 
 var PORT = process.env.PORT || 5000

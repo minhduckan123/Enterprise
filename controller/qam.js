@@ -2,9 +2,18 @@ const express = require('express')
 const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument} = require('../model/databaseControl')
 const router = express.Router()
 
-router.get('/idea', async (req, res) => {
+router.get('/qam', async (req, res) => {
     const ideas = await getDocument("Idea")
-    res.render('ideas',{model:ideas})
+    const users = await getDocument("Users")
+    for(const idea of ideas) { 
+        for(const user of users){
+            if(user._id == idea.userId){
+                idea['user'] = user.userName        
+            }
+        }      
+    } 
+    console.log({model:ideas})
+    res.render('quality_assurance_manager',{model:ideas})
 })
 
 router.get('/idea/:id', async (req, res) => {
@@ -35,8 +44,8 @@ router.post('/addIdea',async (req,res)=>{
         course: course,
         file : file,
     }
-    await insertObject("Idea", objectToInsert)
-    res.redirect('/qam/qam')
+    await insertObject("Users", objectToInsert)
+    res.redirect('/idea/ideas')
 })
 
 module.exports = router;

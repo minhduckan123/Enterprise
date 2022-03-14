@@ -34,6 +34,7 @@ router.post('/addIdea',async (req,res)=>{
         idea: idea,
         course: course,
         file : file,
+        date: new Date(Date.now()).toLocaleString()
     }
     await insertObject("Idea", objectToInsert)
     res.redirect('/qam/qam')

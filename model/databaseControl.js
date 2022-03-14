@@ -37,6 +37,12 @@ async function getDocument(collectionName){
     return results;
 }
 
+async function getDocumentWithCondition(collectionName, limit, sort){
+    const dbo = await getDB()
+    const results = await dbo.collection(collectionName).find({}).sort({sort:1}).limit(10).toArray();
+    return results;
+}
+
 async function getCommentByIdea(id, collectionName){
     const dbo = await getDB()
     const result = await dbo.collection(collectionName).find({idea:id}).toArray();
@@ -44,4 +50,4 @@ async function getCommentByIdea(id, collectionName){
 }
 
 module.exports = { getDB, deleteObject, insertObject,updateDocument, getDocumentById, getDocument,
-    getCommentByIdea}
+    getCommentByIdea, getDocumentWithCondition}

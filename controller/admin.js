@@ -14,8 +14,8 @@ router.get('/users/:id', async (req, res) => {
     res.render('users',{model:user})
 })
 
-router.get('/addUser',(req,res)=>{
-    res.render('addUser')
+router.get('/addUsers',(req,res)=>{
+    res.render('admin/addUsers')
 })
 
 router.get('/deleteUser/:id', async (req, res) => {
@@ -24,7 +24,7 @@ router.get('/deleteUser/:id', async (req, res) => {
     res.redirect('/admin/users')
 })
 
-router.post('/addUser',async (req,res)=>{
+router.post('/addUsers',async (req,res)=>{
     const name = req.body.txtName
     const pass = req.body.txtPass
     const role = req.body.txtRole
@@ -36,7 +36,7 @@ router.post('/addUser',async (req,res)=>{
         email: email,
     }
     await insertObject("Users", objectToInsert)
-    res.redirect('/admin/users')
+    res.redirect('/admin/home')
 })
 
 router.post('/addCourse',async (req,res)=>{
@@ -72,6 +72,10 @@ router.get('/editUser/:id', async (req, res) => {
     const idValue = req.params.id
     const userToEdit = await getDocumentById(idValue, "Users")
     res.render("editUser", { user: userToEdit })
+})
+
+router.get('/home', async (req, res) => {
+    res.render("admin/home")
 })
 
 module.exports = router;

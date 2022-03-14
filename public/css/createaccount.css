@@ -1,0 +1,74 @@
+main{
+    display: flex;
+}
+.left-menu{
+    width: 20%;
+    border-right: 1px solid black;
+}
+.right-content{
+    width: 80%;
+}
+header{
+    border-bottom:1px solid black;
+}
+
+nav ul{
+    list-style-type: none;
+}
+nav ul li {
+    margin : 5px;
+}
+.icon{
+    display: flex;
+    align-items: center;
+}
+#login-site{
+    border-bottom: 2px solid blue;
+    color : blue;
+}
+img{
+    height: 30px;
+}
+.menu-title{
+    display: flex;
+    align-items: center;
+    border-bottom:1px solid black;
+}
+.menu-title img{
+    height: 20px;
+    margin: 2px;
+    justify-content: flex-start;
+}
+.menu-title p {
+    font-size: larger;
+    margin: 2px;
+}
+.information {
+    display: flex;
+    align-items: center;
+    border-bottom:1px solid black;
+}
+.information img{
+    height: 40px;
+    margin-right: 2px;
+}
+.left-menu ul{
+    list-style-type: none;
+}
+/* .left-menu ul li{
+    display: flex;
+} */
+.left-menu img{
+    height: 20px;
+}
+.right-content {
+    width:600px; height:auto; overflow:hidden; padding-bottom:20px; margin-left:auto; margin-right:auto; 
+    border-radius:5px; padding-left:10px; margin-top:100px; border-top:3px double #f1f1f1; 
+    border-bottom:3px double #f1f1f1; padding-top:20px;
+}
+.tabl{
+    cellspacing: "2"; 
+    align: "center"; 
+    cellpadding: 8; 
+    border: 0;
+}

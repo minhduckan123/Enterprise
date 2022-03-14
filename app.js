@@ -8,6 +8,9 @@ app.set('view engine','hbs')
 var publicDir = require('path').join(__dirname,'/public');
 app.use(express.static(publicDir));
 
+var partialDir = require('path').join(__dirname,'/views/partials');
+hbs.registerPartials(partialDir)
+
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended:false}))
 

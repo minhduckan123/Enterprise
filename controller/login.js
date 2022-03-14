@@ -26,12 +26,12 @@ router.post('/doLogin', async (req,res)=>{
         return
     }
     
-    res.cookie('userId', user._id, {signed:true, expires: new Date(Date.now() + 100000)})
+    res.cookie('userId', user._id, {signed:true, expires: new Date(Date.now() + 900000)})
 
     if(user.role == 'QAM'){
-        res.render('qam')
+        res.redirect('/qam/qam')
     }else if(user.role == 'Admin'){
-        res.redirect('/admin/users')
+        res.redirect('/admin/home')
     }else if(user.role == 'Staff'){
         res.redirect('/staff/ideas')
     // }else{

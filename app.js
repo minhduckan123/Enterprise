@@ -4,6 +4,7 @@ var app = express()
 
 var hbs = require('hbs')
 app.set('view engine','hbs')
+app.set('views', require('path').join(__dirname, 'views'));
 
 var publicDir = require('path').join(__dirname,'/public');
 app.use(express.static(publicDir));

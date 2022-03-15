@@ -28,7 +28,7 @@ router.post('/doLogin', async (req,res)=>{
     
     res.cookie('userId', user._id, {signed:true, expires: new Date(Date.now() + 900000)})
 
-    if(user.role == 'QAM'){
+    if(user.role == 'Quality Assurance Manager'){
         res.redirect('/qam/qam')
     }else if(user.role == 'Admin'){
         res.redirect('/admin/home')

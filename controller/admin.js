@@ -1,6 +1,7 @@
 const express = require('express')
 const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument} = require('../model/databaseControl')
 const router = express.Router()
+const date = require('date-and-time')
 
 router.get('/users', async (req, res) => {
     const users = await getDocument("Users")
@@ -39,17 +40,31 @@ router.post('/addUsers',async (req,res)=>{
     res.redirect('/admin/home')
 })
 
+router.get('/courses', async (req, res) => {
+    const courses = await getDocument("Course")
+    res.render("admin/courses",{model:courses})
+})
+
+router.get('/addCourse', async (req, res) => {
+    res.render("admin/addCourse")
+})
+
 router.post('/addCourse',async (req,res)=>{
-    const name = req.body.txtName
-    const deadline1 = req.body.txtDL1
-    const deadline2 = req.body.txtDL2
+    const course = req.body.txtCourse
+
+    const dl1 = req.body.txtDL1
+    const deadline1 = new Date(dl1)
+
+    const dl2 = req.body.txtDL2
+    const deadline2 = new Date(dl2)
+    
     const objectToInsert = {
-        courseName: name,
-        deadLine1: deadline1,
-        deadLine2: deadline2,
+        courseName: course,
+        deadLine1: date.format(deadline1,'YYYY/MM/DD HH:mm'),
+        deadLine2: date.format(deadline2,'YYYY/MM/DD HH:mm'),
     }
     await insertObject("Course", objectToInsert)
-    res.redirect('/admin/users')
+    res.redirect('/admin/courses')
 })
 
 router.post('/update', async (req, res) => {
@@ -77,5 +92,7 @@ router.get('/editUser/:id', async (req, res) => {
 router.get('/home', async (req, res) => {
     res.render("admin/home")
 })
+
+
 
 module.exports = router;

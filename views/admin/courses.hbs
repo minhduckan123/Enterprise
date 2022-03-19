@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../css/adminSetDate.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <title>Courses</title>
+</head>
+<body>
+    <div class="container-fluid">
+    {{> adminHeader}}
+        <div class="container mt-3">
+            <div class="right-content">
+                <div>
+                    <h3>Courses Details</h3>
+                </div>
+                <div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Courses</th>
+                                <th>First Closure Date</th>
+                                <th>Final Closure Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each model}}
+                            <tr>
+                                <td>{{courseName}}</td>
+                                <td>{{deadLine1}}</td>
+                                <td>{{deadLine2}}</td>
+                                <td>
+                                    <a href="">Edit</a>
+                                    <a href="">Delete</a>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                    <a href="/admin/addCourse" class="btn btn-primary">Create New Course</a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,5 +1,5 @@
 const express = require('express')
-const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument, getDocumentWithCondition} = require('../model/databaseControl')
+const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument, getDocumentWithCondition, getCommentByIdea} = require('../model/databaseControl')
 const router = express.Router()
 const fs = require('fs')
 const admzip = require('adm-zip')
@@ -72,6 +72,7 @@ router.post('/qam/addComment',async (req,res)=>{
     const objectToInsert = {
         text: text,
         ideaId: ideaId,
+        date: new Date(Date.now()).toLocaleString()
     }
     await insertObject("Comment", objectToInsert)
     res.redirect('/qam/qam')
@@ -147,6 +148,27 @@ router.get('/downloadZipFile',  (req, res)=>{
     res.set('Content-Length',data.length);
     res.send(data);
 
+})
+
+router.get('/idea/:id', async (req, res) => {
+    const id = req.params.id
+    const idea = await getDocumentById(id, "Idea")
+    const comments = await getCommentByIdea(id, "Comment")
+
+    let commentNumber = 0
+    for(const comment of comments){
+        if(idea._id == comment.ideaId){
+            commentNumber += 1
+        }
+        idea['commentNumber'] = commentNumber
+    }
+
+    for(const user of users){
+        if(user._id == idea.userId){
+            idea['user'] = user.userName        
+        }
+    }      
+    res.render('quality_assurance_manager',{model:comment}, {ideaModel:idea})
 })
 
 module.exports = router;

@@ -32,6 +32,7 @@ router.get('/qam/:sort', async (req, res) => {
     const ideas = await getDocumentWithCondition("Idea", 10, sort)
     const users = await getDocument("Users")
     const comments = await getDocument("Comment")
+    const ratings = await getDocument("Rating")
 
     for(const idea of ideas) { 
     /*    console.log(idea.date)
@@ -49,6 +50,23 @@ router.get('/qam/:sort', async (req, res) => {
             idea['commentNumber'] = commentNumber
         }
 
+        let likeNumber = 0
+        let dislikeNumber = 0
+        for(const rate of ratings){
+            if(idea._id == rate.ideaId){
+                if(rate.rate=="Like"){
+                    likeNumber += 1
+                }
+                else if(rate.rate=="Dislike"){
+                    dislikeNumber += 1
+                }
+            }
+        }
+        rateScore = likeNumber - dislikeNumber
+        idea['likeNumber'] = likeNumber
+        idea['dislikeNumber'] = dislikeNumber
+        idea['rateScore'] = rateScore
+
         for(const user of users){
             if(user._id == idea.userId){
                 idea['user'] = user.userName        
@@ -56,10 +74,10 @@ router.get('/qam/:sort', async (req, res) => {
         }      
     }
     if(sort == "Comment"){
-        ideas.sort((a, b) => (a.commentNumber > b.commentNumber) ? 1 : -1)
+        ideas.sort((a, b) => (b.commentNumber > a.commentNumber) ? 1 : -1)
     }
     if(sort == "Rating"){
-        ideas.sort((a, b) => (a.rating > b.rating) ? 1 : -1)
+        ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
     }
     res.render('quality_assurance_manager',{model:ideas})
 })

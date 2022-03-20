@@ -73,7 +73,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label >Content:</label>
+                            <label >Content</label>
                             <textarea class="form-control" rows="5" name="txtIdea" required></textarea>
                         </div>
 
@@ -117,7 +117,6 @@
                 {{#each model}}   
                 <div class="post border">
                     <div class="user-block">
-<<<<<<< HEAD
                         <img class="img-circle img-bordered-sm fakeimg" src="/img/avatar.png" alt="user image">
                         <span class="username">
                             <a href="#">{{user}}</a>
@@ -145,34 +144,6 @@
                         </span>
                     </p>
 
-=======
-                    <img class="img-circle img-bordered-sm fakeimg" src="/img/avatar.png" alt="user image">
-                    <span class="username">
-                    <a href="#">
-                        {{user}}
-                    </a>
-                    <a href="#" class="float-right btn-tool"><i class="fas fa-times">{{date}}</i></a>
-                    </span>
-                    <span class="description"></span>
-                    </div>
-                    
-                    <p>
-                    {{idea}}
-                    </p>
-                    <p>
-                    <form action="rate/{{_id}}" method="post">
-                        <button type="submit" name="rate" value="Like" class="btn-link">{{likeNumber}} Like</button>
-                        <button type="submit" name="rate" value="Dislike" class="btn-link">{{dislikeNumber}} Dislike</button>
-                    </form>
-
-
-                    <span class="float-right">
-                    <a href="#" class="link-black text-sm">
-                    <i class="far fa-comments mr-1"></i> Comments ({{commentNumber}})
-                    </a>
-                    </span>
-                    </p>
->>>>>>> 3b6f7e6c3e0ec8dbc2df7893f3e2ee478b0b4e10
                     <form action="addComment" method="POST">
                         <input class="form-control form-control-sm" type="text" placeholder="Type a comment" name="txtComment" id="">
                         <input type="text" name="ideaId" id="" value={{_id}} hidden />
@@ -185,66 +156,13 @@
                 </div>
                 <br><br>
                 {{/each}} 
-<<<<<<< HEAD
+
                 <br><br>                    
-=======
-                <br><br>
-                <div class="container">
-                    <canvas id="myChart"></canvas>
-                </div>
-                
-                    
->>>>>>> 3b6f7e6c3e0ec8dbc2df7893f3e2ee478b0b4e10
+
             </div>
         </div>
     </div>
     <br><br>
-<<<<<<< HEAD
-=======
-    
-    <div class="jumbotron text-center" style="margin-bottom:0">
-        <p>Footer</p>
-    </div>
-    <script>
-    
-        var ctx = document.getElementById("myChart").getContext("2d");
 
-        var data = {
-            labels: ["2014", "2015", "2016"],
-            datasets: [
-                {
-                    label: "Táo",
-                    backgroundColor: "blue",
-                    data: [3,7,4]
-                },
-                {
-                    label: "Cam",
-                    backgroundColor: "red",
-                    data: [4,3,5]
-                },
-                {
-                    label: "Lê",
-                    backgroundColor: "green",
-                    data: [7,2,6]
-                }
-            ]
-        };
-
-        var myBarChart = new Chart(ctx, {
-            type: 'bar',
-            data: data,
-            options: {
-                barValueSpacing: 20,
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            min: 0,
-                        }
-                    }]
-                }
-            }
-        });
-      </script>
->>>>>>> 3b6f7e6c3e0ec8dbc2df7893f3e2ee478b0b4e10
 </body>
 </html>

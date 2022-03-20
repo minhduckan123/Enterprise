@@ -133,61 +133,6 @@ router.get('/:sort', async (req, res) => {
     res.render('staff',{model:ideas})
 })
 
-router.get('/:sort', async (req, res) => {
-    const sort = req.params.sort
-    const ideas = await getDocumentWithCondition("Idea", 10, sort)
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
-
-    for(const idea of ideas) { 
-    /*    console.log(idea.date)
-        let dateShow = idea.date
-        console.log(dateShow)
-        dateShow = dateShow.toLocaleString()
-        
-        idea['dateShow'] = dateShow
-    */
-        let commentNumber = 0
-        for(const comment of comments){
-            if(idea._id == comment.ideaId){
-                commentNumber += 1
-            }      
-        }
-        idea['commentNumber'] = commentNumber
-
-        let likeNumber = 0
-        let dislikeNumber = 0
-        for(const rate of ratings){
-            if(idea._id == rate.ideaId){
-                if(rate.rate=="Like"){
-                    likeNumber += 1
-                }
-                else if(rate.rate=="Dislike"){
-                    dislikeNumber += 1
-                }
-            }
-        }
-        rateScore = likeNumber - dislikeNumber
-        idea['likeNumber'] = likeNumber
-        idea['dislikeNumber'] = dislikeNumber
-        idea['rateScore'] = rateScore
-        
-        for(const user of users){
-            if(user._id == idea.userId){
-                idea['user'] = user.userName        
-            }
-        }      
-    }
-    console.log(ideas)
-    if(sort == "rating"){
-        ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
-    }
-
-    res.render('staff',{model:ideas})
-})
-
-
 router.get('/comment/:id', async (req, res) => {
     const idValue = req.params.id
     const comments = await getCommentByIdea(idValue ,"Comment")

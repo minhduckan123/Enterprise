@@ -69,6 +69,8 @@ router.get('/qam/:sort', async (req, res) => {
 router.post('/qam/addComment',async (req,res)=>{
     const text = req.body.txtComment
     const ideaId = req.body.ideaId
+    const users = await getDocument("Users")
+    const idea = await getDocumentById(ideaId, "Idea")
     const objectToInsert = {
         text: text,
         ideaId: ideaId,
@@ -76,6 +78,33 @@ router.post('/qam/addComment',async (req,res)=>{
     }
     await insertObject("Comment", objectToInsert)
     res.redirect('/qam/qam')
+    let themail = "19";
+    for (const user of users) {
+        if (user._id == idea.userId) {
+            themail = user.email
+        }
+    }
+    console.log(themail)
+    const nodemailer = require('nodemailer');
+    const transport = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: 'group4enterprise2022@gmail.com',
+            pass: 'group45678',
+        },
+    });
+    const mailOptions = {
+        from: 'group4enterprise2022@gmail.com',
+        to: themail,
+        subject: 'New Comment',
+        html: 'Someone comment on your Idea',
+    };
+    transport.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+        }
+        console.log('Email sent: ' + info.response);
+    });
 })
 
 router.get('/idea/:id', async (req, res) => {

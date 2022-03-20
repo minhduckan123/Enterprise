@@ -9,7 +9,7 @@
 </head>
 <body>
     <h1 align="center"><a href="/">Group 4</a></h1>
-    <form action="/Idea/addIdea" method="POST">
+    <form action="/idea/addIdea" method="POST" enctype="multipart/form-data">
     <table align="center" border="1px" style="background-color:rgb(114, 191, 214);">
         <tr>
             <td width="100">User</td>
@@ -25,7 +25,7 @@
         </tr>
         <tr>
             <td>File</td>
-            <td><input type="text" name="txtFile" id=""></td>
+            <td><input type="file" name="txtFile" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple ></td>
         </tr>
         <tr>
             <td colspan = 2 align="center"><input type="submit" value="Insert"></td>

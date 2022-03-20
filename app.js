@@ -12,6 +12,9 @@ app.use(express.static(publicDir));
 var partialDir = require('path').join(__dirname,'/views/partials');
 hbs.registerPartials(partialDir)
 
+// var uploadDir = require('path').join(__dirname,'/uploads');
+// app.use(express.static(uploadDir))
+
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended:false}))
 
@@ -44,7 +47,7 @@ const emailController = require('./controller/email')
 app.use('/email', emailController)
 
 const staffController = require('./controller/staff')
-app.use('/staff', staffController)
+app.use('/staff' ,authMiddleware.authLogIn, staffController)
 
 const qamController = require('./controller/qam')
 app.use('/qam', qamController)
@@ -54,3 +57,4 @@ app.use('/qam', qamController)
 var PORT = process.env.PORT || 5000
 app.listen(PORT);
 console.log("Server is running at " + PORT)
+

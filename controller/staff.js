@@ -14,27 +14,6 @@ router.get('/staff', async (req, res) => {
 router.get('/addIdea', (req, res) => {
 
     res.render('staff_add_idea')
-    
-    const nodemailer = require('nodemailer');
-    const transport = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: {
-            user: 'group4enterprise2022@gmail.com',
-            pass: 'group45678',
-        },
-    });
-    const mailOptions = {
-        from: 'group4enterprise2022@gmail.com',
-        to: 'group4enterprise2022@gmail.com',
-        subject: 'New Idea',
-        html: 'A staff submited a new Idea',
-    };
-    transport.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log(error);
-        }
-        console.log('Email sent: ' + info.response);
-    });
 })
 
 const storage = multer.diskStorage({
@@ -78,6 +57,27 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
         console.log(error)
     }
 
+        
+    const nodemailer = require('nodemailer');
+    const transport = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: 'group4enterprise2022@gmail.com',
+            pass: 'group45678',
+        },
+    });
+    const mailOptions = {
+        from: 'group4enterprise2022@gmail.com',
+        to: 'group4enterprise2022@gmail.com',
+        subject: 'New Idea',
+        html: 'A staff submited a new Idea',
+    };
+    transport.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+        }
+        console.log('Email sent: ' + info.response);
+    });
     res.redirect('/staff/ideas')
 })
 

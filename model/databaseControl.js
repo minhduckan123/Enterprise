@@ -45,7 +45,7 @@ async function getDocumentWithCondition(collectionName, limit, sort){
 
 async function getCommentByIdea(id, collectionName){
     const dbo = await getDB()
-    const result = await dbo.collection(collectionName).find({idea:id}).toArray();
+    const result = await dbo.collection(collectionName).find({ideaId:id}).toArray();
     return result;
 }
 

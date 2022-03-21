@@ -44,10 +44,11 @@
                     <a class="dropdown-item" href="#">Latest Comments</a>
                 </div>
             </div>
-            <button type="button" class="btn btn-dark text-white" data-toggle="modal" data-target="#myModal">
+            <a href="addIdea">
+            <button type="button" class="btn btn-dark text-white">
                 Create New Idea
-              </button>
-              
+            </button>
+            </a> 
               <!-- The Modal -->
               <div class="modal" id="myModal">
                 <div class="modal-dialog">
@@ -137,24 +138,16 @@
                         <form action="rate/{{_id}}" method="post">
                             <button type="submit" name="rate" value="Like" class="btn-link">{{likeNumber}} Like</button>
                             <button type="submit" name="rate" value="Dislike" class="btn-link">{{dislikeNumber}} Dislike</button>
-                        </form>
+                        
 
                         <span class="float-right">
-                            <a href="#" class="link-black text-sm">
+                            <a href="ideaDetail/{{_id}}" class="link-black text-sm">
                                 <i class="far fa-comments mr-1">Comments ({{commentNumber}})</i> 
                             </a>
                         </span>
+                        </form>
                     </p>
-
-                    <form action="addComment" method="POST">
-                        <input class="form-control form-control-sm" type="text" placeholder="Type a comment" name="txtComment" id="">
-                        <input type="text" name="ideaId" id="" value={{_id}} hidden />
-                        <input type="submit" hidden />
-                    </form>
-                    <div class="media-body">
-                        <h5><a href="#">Jane Doe</a> Comment - 8:40 PM today</h5>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                    </div>
+                    </p>
                 </div>
                 <br><br>
                 {{/each}} 

@@ -52,6 +52,9 @@ app.use('/staff', authMiddleware.authLogIn, staffController)
 const qamController = require('./controller/qam')
 app.use('/qam', authMiddleware.authLogIn, qamController)
 
+const qacController = require('./controller/qac')
+app.use('/qac', qacController)
+
 
 
 var PORT = process.env.PORT || 5000

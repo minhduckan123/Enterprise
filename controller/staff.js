@@ -1,5 +1,5 @@
 const express = require('express')
-const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument, getDocumentWithCondition, getDB } = require('../model/databaseControl')
+const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument, getDocumentWithCondition, getCommentByIdea, getDB} = require('../model/databaseControl')
 const router = express.Router()
 const multer = require("multer");
 const { route } = require('express/lib/application');
@@ -70,6 +70,7 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
             course: course,
             category:category,
             file: file,
+            views: 0,
             date: new Date(Date.now()).toLocaleString()
         }
         await insertObject("Idea", objectToInsert)
@@ -79,6 +80,7 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
 
     res.redirect('/staff/ideas')
 })
+
 
 router.get('/ideas', async (req, res) => {
     const ideas = await getDocument("Idea")
@@ -105,6 +107,8 @@ router.get('/ideas', async (req, res) => {
     res.render('staff', { model: ideas, userID: userId, categories:categories })
 })
 
+
+//Main view all idea
 router.get('/:sort', async (req, res) => {
     const sort = req.params.sort
     const ideas = await getDocumentWithCondition("Idea", 10, sort)
@@ -151,22 +155,72 @@ router.get('/:sort', async (req, res) => {
             }
         }
     }
-    console.log(ideas)
-    if (sort == "rating") {
+    if(sort == "rating"){
         ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
     }
 
     res.render('staff', { model: ideas })
 })
 
-router.get('/comment/:id', async (req, res) => {
-    const idValue = req.params.id
-    const comments = await getCommentByIdea(idValue, "Comment")
-    res.render('comment', { model: comments })
+//Idea detail
+router.get('/ideaDetail/:id', async (req, res) => {
+    const id = req.params.id
+    const idea = await getDocumentById(id, "Idea")
+    const users = await getDocument("Users")
+    const comments = await getDocument("Comment")
+    const ratings = await getDocument("Rating")
+    //const comments = await getCommentByIdea(id, "Comment")
+    let commentNumber = 0
+    let commentByIdea = []
+        for(const comment of comments){
+            if(idea._id == comment.ideaId){
+                commentNumber += 1
+                commentByIdea.push(comment)
+            }      
+        }
+    idea['commentNumber'] = commentNumber
+    let likeNumber = 0
+    let dislikeNumber = 0
+    for (const rate of ratings) {
+        if (idea._id == rate.ideaId) {
+            if (rate.rate == "Like") {
+                likeNumber += 1
+            }
+            else if (rate.rate == "Dislike") {
+                dislikeNumber += 1
+            }
+        }
+    }
+    idea['likeNumber'] = likeNumber
+    idea['dislikeNumber'] = dislikeNumber
+
+    for (const user of users) {
+        if (user._id == idea.userId) {
+            idea['user'] = user.userName
+        }
+    }
+    //Increase view
+    let updateValues = { $set: {
+        userId: idea.userId,
+        idea: idea.idea,
+        course: idea.course,
+        file : idea.file,
+        views : parseInt(idea.views) + 1,
+        date: new Date(Date.now()).toLocaleString()
+    } };
+    await updateDocument(id, updateValues, "Idea") 
+
+    let ideas = []
+    ideas.push(idea)
+    console.log(commentByIdea)
+    res.render('staff_idea_detail',{model:ideas, comments:commentByIdea})
 })
 
-router.get('/addComment', (req, res) => {
-    res.render('addComment')
+router.get('/comment/:id', async (req, res) => {
+    const idValue = req.params.id
+    const comments = await getCommentByIdea(idValue ,"Comment")
+    console.log(comments)
+    res.render('comment',{model:comments})
 })
 
 router.get('/deleteComment/:id', async (req, res) => {
@@ -188,7 +242,19 @@ router.post('/addComment', async (req, res) => {
     res.redirect('/ideas')
 })
 
-router.post('/rate/:id', async (req, res) => {
+router.post('/ideaDetail/addComment',async (req,res)=>{
+    const text = req.body.txtComment
+    const ideaId = req.body.ideaId
+    const objectToInsert = {
+        text: text,
+        ideaId: ideaId,
+        date: new Date(Date.now()).toLocaleString()
+    }
+    await insertObject("Comment", objectToInsert)
+    res.redirect('/staff/ideaDetail/' + ideaId)
+})
+
+router.post('/rate/:id', async (req,res)=>{
     const ideaId = req.params.id //Dung hidden field
     const userId = 1 //Truyen vao tu token
     const rate = req.body.rate

@@ -5,16 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <style>
-        .fakeimg {
-            height: 35px;
-            background: #aaa;
-        }
+    .fakeimg {
+        height: 35px;
+        background: #aaa;
+    }
     </style>
     <title>Quality Assurance Manager</title>
 </head>
@@ -22,6 +21,7 @@
     <div class="jumbotron text-center text-dark bg-secondary" style="margin-bottom:0">
         <a href="/login/logout" class="float-right btn btn-dark">Log out</a>
         <h1>Quality Assurance Manager</h1>
+        <p>Resize this responsive page to see the effect!</p> 
     </div>
     
     <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
@@ -43,7 +43,13 @@
                 </div>
             </div>
             <div class="btn-group">
-                <a type="button" class="btn btn-dark" href="/qam/categories">Category</a>
+                <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown">
+                    Category
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Add New</a>
+                    <a class="dropdown-item" href="#">Delete</a>
+                </div>
             </div>
             <div class="btn-group">
                 <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown">
@@ -60,7 +66,7 @@
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="#">Download all idea data after the final closure date in CSV file</a>
-                    <a class="dropdown-item" href="/qam/downloadZipFile">Download all uploaded documents in ZIP format</a>
+                    <a class="dropdown-item" href="#">Download all uploaded documents in ZIP format</a>
                 </div>
             </div>
         </ul>
@@ -72,83 +78,42 @@
         
             <div>
                 {{#each model}}   
-                <div class="container post border" >
+                <div class="post border">
                     <div class="user-block">
-                        <img class="img-circle img-bordered-sm fakeimg" src="/img/avatar.png" alt="user image">
-                        <span class="username">
-                            <a href="#">{{user}}</a>
-                            <a href="#" class="float-right btn-tool"><i class="fas fa-times">{{date}}</i></a>
-                        </span>
-                        <span class="description"></span>
+                    <img class="img-circle img-bordered-sm fakeimg" src="/img/avatar.png" alt="user image">
+                    <span class="username">
+                    <a href="#">
+                        {{user}}
+                    </a>
+                    <a href="#" class="float-right btn-tool"><i class="fas fa-times">{{date}}</i></a>
+                    </span>
+                    <span class="description"></span>
                     </div>
                     
-                    <p>{{idea}}</p>
-
-                    {{#each file}}
-                        <a href="../../uploads/{{filename}}" target="_blank">{{filename}}<br></a>
-                    {{/each}}
+                    <p>
+                    {{idea}}
+                    </p>
                     <p>
                     <span class="link-black text-sm"><i class="far fa-thumbs-up mr-1"></i> {{likeNumber}} Like</span>
                     <span class="link-black text-sm"><i class="far fa-thumbs-up mr-1"></i> {{dislikeNumber}} Dislike</span>
-                    <span class="float-right">
                     <a href="ideaDetail/{{_id}}" class="link-black text-sm">
                     <i class="far fa-comments mr-1"></i> Comments ({{commentNumber}})
                     </a>
                     </span>
+                    </form>
                     </p>
-                </div>
-                <br><br>
-                {{/each}} 
-                <div class="container">
-                    <canvas id="myChart"></canvas>
-                </div>   
+                    {{/each}} 
+                    {{#each comments}}
+                    <div class="media-body" style="border:grey;border-style:solid">
+                        <h5><a href="#">{{user}}</a> {{date}}</h5>
+                        <p>{{text}}</p>
+                    </div>
+                    <br><br>
+                    {{/each}}
+                </div>    
             </div>
         </div>
     </div>
     <br><br>
-    
-    <div class="jumbotron text-center" style="margin-bottom:0">
-        <p>Footer</p>
-    </div>
-    <script>
-    
-        var ctx = document.getElementById("myChart").getContext("2d");
-
-        var data = {
-            labels: ["2014", "2015", "2016"],
-            datasets: [
-                {
-                    label: "Táo",
-                    backgroundColor: "blue",
-                    data: [3,7,4]
-                },
-                {
-                    label: "Cam",
-                    backgroundColor: "red",
-                    data: [4,3,5]
-                },
-                {
-                    label: "Lê",
-                    backgroundColor: "green",
-                    data: [7,2,6]
-                }
-            ]
-        };
-
-        var myBarChart = new Chart(ctx, {
-            type: 'bar',
-            data: data,
-            options: {
-                barValueSpacing: 20,
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            min: 0,
-                        }
-                    }]
-                }
-            }
-        });
-      </script>
 </body>
 </html>

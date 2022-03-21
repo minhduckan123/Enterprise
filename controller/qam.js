@@ -80,24 +80,89 @@ router.post('/qam/addComment',async (req,res)=>{
 })
 
 router.get('/idea/:id', async (req, res) => {
+    const idValue = req.params.id
+    const comments = await getCommentByIdea(idValue ,"Comment")
+    res.render('comment',{model:comments})
+})
+
+
+router.get('/addIdea',(req,res)=>{
+    res.render('addIdea')
+})
+
+router.get('/deleteIdea/:id', async (req, res) => {
+    const idValue = req.params.id
+    await deleteObject(idValue, "Idea")
+    res.redirect('/admin/ideas')
+})
+
+router.post('/addIdea',async (req,res)=>{
+    const user = req.body.txtUser
+    const idea = req.body.txtIdea
+    const course = req.body.txtCourse
+    const file = req.body.txtFile
+    const objectToInsert = {
+        user: user,
+        idea: idea,
+        course: course,
+        file : file,
+    }
+    await insertObject("Users", objectToInsert)
+    res.redirect('/idea/ideas')
+})
+
+router.get('/ideaDetail/:id', async (req, res) => {
     const id = req.params.id
     const idea = await getDocumentById(id, "Idea")
-    const comments = await getCommentByIdea(id, "Comment")
-
+    const users = await getDocument("Users")
+    const comments = await getDocument("Comment")
+    const ratings = await getDocument("Rating")
+    //const comments = await getCommentByIdea(id, "Comment")
     let commentNumber = 0
-    for(const comment of comments){
-        if(idea._id == comment.ideaId){
-            commentNumber += 1
+    let commentByIdea = []
+        for(const comment of comments){
+            if(idea._id == comment.ideaId){
+                commentNumber += 1
+                commentByIdea.push(comment)
+            }      
         }
-        idea['commentNumber'] = commentNumber
+    idea['commentNumber'] = commentNumber
+    let likeNumber = 0
+    let dislikeNumber = 0
+    for (const rate of ratings) {
+        if (idea._id == rate.ideaId) {
+            if (rate.rate == "Like") {
+                likeNumber += 1
+            }
+            else if (rate.rate == "Dislike") {
+                dislikeNumber += 1
+            }
+        }
     }
+    idea['likeNumber'] = likeNumber
+    idea['dislikeNumber'] = dislikeNumber
 
-    for(const user of users){
-        if(user._id == idea.user){
-            idea['user'] = user.userName        
+    for (const user of users) {
+        if (user._id == idea.userId) {
+            idea['user'] = user.userName
+
         }
-    }      
-    res.render('quality_assurance_manager',{model:comment}, {ideaModel:idea})
+    }
+    //Increase view
+    let updateValues = { $set: {
+        userId: idea.userId,
+        idea: idea.idea,
+        course: idea.course,
+        file : idea.file,
+        views : parseInt(idea.views) + 1,
+        date: new Date(Date.now()).toLocaleString()
+    } };
+    await updateDocument(id, updateValues, "Idea") 
+
+    let ideas = []
+    ideas.push(idea)
+    console.log(commentByIdea)
+    res.render('quality_assurance_manager_idea_detail',{model:ideas, comments:commentByIdea})
 })
 
 

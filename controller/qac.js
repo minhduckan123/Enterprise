@@ -25,6 +25,66 @@ router.get('/qac', async (req, res) => {
     res.render('quality_assurance_coordinator',{model:ideas})
 })
 
+router.get('/:sort', async (req, res) => {
+    const sort = req.params.sort
+    const ideas = await getDocumentWithCondition("Idea", 10, sort)
+    const users = await getDocument("Users")
+    const comments = await getDocument("Comment")
+
+    for(const idea of ideas) { 
+    /*    console.log(idea.date)
+        let dateShow = idea.date
+        console.log(dateShow)
+        dateShow = dateShow.toLocaleString()
+        
+        idea['dateShow'] = dateShow
+    */
+        let commentNumber = 0
+        for(const comment of comments){
+            if(idea._id == comment.ideaId){
+                commentNumber += 1
+            }
+            idea['commentNumber'] = commentNumber
+        }
+
+        let likeNumber = 0
+        let dislikeNumber = 0
+        for (const rate of ratings) {
+            if (idea._id == rate.ideaId) {
+                if (rate.rate == "Like") {
+                    likeNumber += 1
+                }
+                else if (rate.rate == "Dislike") {
+                    dislikeNumber += 1
+                }
+            }
+        }
+        rateScore = likeNumber - dislikeNumber
+        idea['likeNumber'] = likeNumber
+        idea['dislikeNumber'] = dislikeNumber
+        idea['rateScore'] = rateScore
+
+        for (const user of users) {
+            if (user._id == idea.user) {
+                idea['user'] = user.userName
+            }
+        }
+
+        for(const user of users){
+            if(user._id == idea.userId){
+                idea['user'] = user.userName        
+            }
+        }      
+    }
+    if(sort == "Comment"){
+        ideas.sort((a, b) => (a.commentNumber > b.commentNumber) ? 1 : -1)
+    }
+    if(sort == "Rating"){
+        ideas.sort((a, b) => (a.rating > b.rating) ? 1 : -1)
+    }
+    res.render('quality_assurance_coordinator',{model:ideas})
+})
+
 router.get('/ideaDetail/:id', async (req, res) => {
     const id = req.params.id
     const idea = await getDocumentById(id, "Idea")

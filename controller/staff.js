@@ -13,7 +13,7 @@ router.get('/staff', async (req, res) => {
 
 router.get('/addIdea', (req, res) => {
 
-    res.render('addIdea')
+    res.render('staff_add_idea')
     
     const nodemailer = require('nodemailer');
     const transport = nodemailer.createTransport({

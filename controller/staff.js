@@ -11,9 +11,9 @@ router.get('/staff', async (req, res) => {
     res.render('staff')
 })
 
-router.get('/addIdea', (req, res) => {
-
-    res.render('staff_add_idea')
+router.get('/addIdea', async (req, res) => {
+    const categories = await getDocument("Category")
+    res.render('staff_add_idea', {categories:categories })
 })
 
 const storage = multer.diskStorage({

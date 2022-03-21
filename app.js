@@ -47,10 +47,10 @@ const emailController = require('./controller/email')
 app.use('/email', emailController)
 
 const staffController = require('./controller/staff')
-app.use('/staff' ,authMiddleware.authLogIn, staffController)
+app.use('/staff', authMiddleware.authLogIn, staffController)
 
 const qamController = require('./controller/qam')
-app.use('/qam', qamController)
+app.use('/qam', authMiddleware.authLogIn, qamController)
 
 
 

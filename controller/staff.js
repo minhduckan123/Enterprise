@@ -61,12 +61,14 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
         const user = req.body.txtUser
         const idea = req.body.txtIdea
         const course = req.body.txtCourse
-        const file = req.files.txtFile
+        const category = req.body.txtCategory
+        const file = req.files
 
         const objectToInsert = {
             user: user,
             idea: idea,
             course: course,
+            category:category,
             file: file,
             date: new Date(Date.now()).toLocaleString()
         }
@@ -81,6 +83,7 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
 router.get('/ideas', async (req, res) => {
     const ideas = await getDocument("Idea")
     const users = await getDocument("Users")
+    const categories = await getDocument("Category")
     const comments = await getDocument("Comment")
     for (const idea of ideas) {
         let commentNumber = 0
@@ -99,7 +102,7 @@ router.get('/ideas', async (req, res) => {
     }
     const userId = req.signedCookies.userId
 
-    res.render('staff', { model: ideas, userID: userId })
+    res.render('staff', { model: ideas, userID: userId, categories:categories })
 })
 
 router.get('/:sort', async (req, res) => {

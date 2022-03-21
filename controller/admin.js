@@ -3,10 +3,17 @@ const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument
 const router = express.Router()
 const date = require('date-and-time')
 
-router.get('/users', async (req, res) => {
+//HOME
+router.get('/home', async (req, res) => {
     const users = await getDocument("Users")
-    console.log({model:users})
-    res.render('users',{model:users})
+    let username
+    for(const user of users){
+        if(user._id == req.signedCookies.userId){
+            username = user.userName        
+        }
+    }      
+    
+    res.render("admin/home", {userName:username})
 })
 
 router.get('/users/:id', async (req, res) => {
@@ -15,14 +22,17 @@ router.get('/users/:id', async (req, res) => {
     res.render('users',{model:user})
 })
 
-router.get('/addUsers',(req,res)=>{
-    res.render('admin/addUsers')
-})
-
-router.get('/deleteUser/:id', async (req, res) => {
-    const idValue = req.params.id
-    await deleteObject(idValue, "Users")
-    res.redirect('/admin/users')
+//USER
+router.get('/addUsers', async(req,res)=>{
+    const users = await getDocument("Users")
+    let username
+    for(const user of users){
+        if(user._id == req.signedCookies.userId){
+            username = user.userName        
+        }
+    }      
+    
+    res.render("admin/addUsers", {model:users, userName:username})
 })
 
 router.post('/addUsers',async (req,res)=>{
@@ -37,16 +47,46 @@ router.post('/addUsers',async (req,res)=>{
         email: email,
     }
     await insertObject("Users", objectToInsert)
-    res.redirect('/admin/home')
+    res.redirect('/admin/addUser')
 })
+
+router.get('/deleteUser/:id', async (req, res) => {
+    const idValue = req.params.id
+    await deleteObject(idValue, "Users")
+    res.redirect('/admin/users')
+})
+
+router.get('/editUser/:id', async (req, res) => {
+    const idValue = req.params.id
+    const userToEdit = await getDocumentById(idValue, "Users")
+    res.render("editUser", { user: userToEdit })
+})
+
+//COURSE
 
 router.get('/courses', async (req, res) => {
     const courses = await getDocument("Course")
-    res.render("admin/courses",{model:courses})
+    const users = await getDocument("Users")
+    let username
+    for(const user of users){
+        if(user._id == req.signedCookies.userId){
+            username = user.userName        
+        }
+    }      
+
+    res.render("admin/courses",{model:courses, userName:username})
 })
 
 router.get('/addCourse', async (req, res) => {
-    res.render("admin/addCourse")
+    const users = await getDocument("Users")
+    let username
+    for(const user of users){
+        if(user._id == req.signedCookies.userId){
+            username = user.userName        
+        }
+    }      
+
+    res.render("admin/addCourse", {userName:username})
 })
 
 router.post('/addCourse',async (req,res)=>{
@@ -67,6 +107,12 @@ router.post('/addCourse',async (req,res)=>{
     res.redirect('/admin/courses')
 })
 
+router.get('/deleteCourse', async (req, res) => {
+    const idValue = req.query.id
+    await deleteObject(idValue, "Course")
+    res.redirect('/admin/courses')
+})
+
 router.post('/update', async (req, res) => {
     const id = req.body.txtOId
     const name = req.body.txtUname
@@ -81,16 +127,6 @@ router.post('/update', async (req, res) => {
     } };
     await updateDocument(id, updateValues, "Users")
     res.redirect('/admin/users')
-})
-
-router.get('/editUser/:id', async (req, res) => {
-    const idValue = req.params.id
-    const userToEdit = await getDocumentById(idValue, "Users")
-    res.render("editUser", { user: userToEdit })
-})
-
-router.get('/home', async (req, res) => {
-    res.render("admin/home")
 })
 
 

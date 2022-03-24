@@ -30,12 +30,8 @@ app.get('/adminIndex', async (req, res) => {
 const loginController = require('./controller/login')
 app.use('/login',  loginController)
 
-// app.get('/',async (req,res)=>{
-//     res.render('home')
-// })
-
 const adminController = require('./controller/admin')
-app.use('/admin',authMiddleware.authLogIn, adminController)
+app.use('/admin',authMiddleware.authLogIn, authMiddleware.isAdmin, adminController)
 
 const commentController = require('./controller/comment')
 app.use('/comment', commentController)
@@ -47,13 +43,13 @@ const emailController = require('./controller/email')
 app.use('/email', emailController)
 
 const staffController = require('./controller/staff')
-app.use('/staff', authMiddleware.authLogIn, staffController)
+app.use('/staff', authMiddleware.authLogIn, authMiddleware.isStaff , staffController)
 
 const qamController = require('./controller/qam')
-app.use('/qam', authMiddleware.authLogIn, qamController)
+app.use('/qam', authMiddleware.authLogIn, authMiddleware.isQAM, qamController)
 
 const qacController = require('./controller/qac')
-app.use('/qac', qacController)
+app.use('/qac', authMiddleware.authLogIn, authMiddleware.isQAM, qacController)
 
 
 

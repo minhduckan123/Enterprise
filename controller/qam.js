@@ -20,7 +20,7 @@ router.get('/qam', async (req, res) => {
         }
 
         for(const user of users){
-            if(user._id == idea.userId){
+            if(user._id == idea.user){
                 idea['user'] = user.userName        
             }
         }      
@@ -33,6 +33,7 @@ router.get('/qam/:sort', async (req, res) => {
     const ideas = await getDocumentWithCondition("Idea", 10, sort)
     const users = await getDocument("Users")
     const comments = await getDocument("Comment")
+    const ratings = await getDocument("Rating")
 
     for(const idea of ideas) { 
     /*    console.log(idea.date)
@@ -74,7 +75,7 @@ router.get('/qam/:sort', async (req, res) => {
         }
 
         for(const user of users){
-            if(user._id == idea.userId){
+            if(user._id == idea.user){
                 idea['user'] = user.userName        
             }
         }      
@@ -108,30 +109,10 @@ router.get('/idea/:id', async (req, res) => {
     res.render('comment',{model:comments})
 })
 
-
-router.get('/addIdea',(req,res)=>{
-    res.render('addIdea')
-})
-
 router.get('/deleteIdea/:id', async (req, res) => {
     const idValue = req.params.id
     await deleteObject(idValue, "Idea")
     res.redirect('/admin/ideas')
-})
-
-router.post('/addIdea',async (req,res)=>{
-    const user = req.body.txtUser
-    const idea = req.body.txtIdea
-    const course = req.body.txtCourse
-    const file = req.body.txtFile
-    const objectToInsert = {
-        user: user,
-        idea: idea,
-        course: course,
-        file : file,
-    }
-    await insertObject("Users", objectToInsert)
-    res.redirect('/idea/ideas')
 })
 
 router.get('/ideaDetail/:id', async (req, res) => {
@@ -166,14 +147,14 @@ router.get('/ideaDetail/:id', async (req, res) => {
     idea['dislikeNumber'] = dislikeNumber
 
     for (const user of users) {
-        if (user._id == idea.userId) {
+        if (user._id == idea.user) {
             idea['user'] = user.userName
 
         }
     }
     //Increase view
     let updateValues = { $set: {
-        userId: idea.userId,
+        userId: idea.user,
         idea: idea.idea,
         course: idea.course,
         file : idea.file,

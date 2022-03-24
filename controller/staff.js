@@ -6,14 +6,11 @@ const { route } = require('express/lib/application');
 const async = require('hbs/lib/async');
 const path = require('path')
 
-
-router.get('/staff', async (req, res) => {
-    res.render('staff')
-})
-
 router.get('/addIdea', async (req, res) => {
     const categories = await getDocument("Category")
-    res.render('staff_add_idea', {categories:categories })
+    const userId = req.signedCookies.userId
+
+    res.render('staff_add_idea', {categories:categories, userId:userId})
 })
 
 const storage = multer.diskStorage({
@@ -102,9 +99,8 @@ router.get('/ideas', async (req, res) => {
             }
         }
     }
-    const userId = req.signedCookies.userId
 
-    res.render('staff', { model: ideas, userID: userId, categories:categories })
+    res.render('staff', { model: ideas, categories:categories })
 })
 
 
@@ -195,7 +191,7 @@ router.get('/ideaDetail/:id', async (req, res) => {
     idea['dislikeNumber'] = dislikeNumber
 
     for (const user of users) {
-        if (user._id == idea.userId) {
+        if (user._id == idea.user) {
             idea['user'] = user.userName
         }
     }

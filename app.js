@@ -37,15 +37,6 @@ app.use('/login',  loginController)
 const adminController = require('./controller/admin')
 app.use('/admin',authMiddleware.authLogIn, adminController)
 
-const commentController = require('./controller/comment')
-app.use('/comment', commentController)
-
-const ideaController = require('./controller/idea')
-app.use('/idea', ideaController)
-
-const emailController = require('./controller/email')
-app.use('/email', emailController)
-
 const staffController = require('./controller/staff')
 app.use('/staff', authMiddleware.authLogIn, staffController)
 

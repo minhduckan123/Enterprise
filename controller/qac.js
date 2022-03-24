@@ -30,6 +30,7 @@ router.get('/:sort', async (req, res) => {
     const ideas = await getDocumentWithCondition("Idea", 10, sort)
     const users = await getDocument("Users")
     const comments = await getDocument("Comment")
+    const ratings = await getDocument("Rating")
 
     for(const idea of ideas) { 
     /*    console.log(idea.date)
@@ -76,11 +77,11 @@ router.get('/:sort', async (req, res) => {
             }
         }      
     }
-    if(sort == "Comment"){
-        ideas.sort((a, b) => (a.commentNumber > b.commentNumber) ? 1 : -1)
+    if(sort == "comment"){
+        ideas.sort((a, b) => (b.commentNumber > a.commentNumber) ? 1 : -1)
     }
-    if(sort == "Rating"){
-        ideas.sort((a, b) => (a.rating > b.rating) ? 1 : -1)
+    if(sort == "rating"){
+        ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
     }
     res.render('quality_assurance_coordinator',{model:ideas})
 })

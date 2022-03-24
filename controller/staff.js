@@ -78,7 +78,7 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
         }
         console.log('Email sent: ' + info.response);
     });
-    res.redirect('/staff/ideas')
+    res.redirect('/staff/rating')
 })
 
 

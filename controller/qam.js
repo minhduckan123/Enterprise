@@ -5,6 +5,8 @@ const fs = require('fs')
 const admzip = require('adm-zip')
 
 //IDEA & COMMENT
+<<<<<<< HEAD
+=======
 router.get('/qam', async (req, res) => {
     const sort = req.params.sort
     const ideas = await getDocumentWithCondition("Idea", 10, "_id")
@@ -28,6 +30,7 @@ router.get('/qam', async (req, res) => {
     res.render('quality_assurance_manager',{model:ideas})
 })
 
+>>>>>>> e7753d30fdcd1b7c443ac6546d3151abd22bd2c0
 router.get('/qam/:sort', async (req, res) => {
     const sort = req.params.sort
     const ideas = await getDocumentWithCondition("Idea", 10, sort)
@@ -80,15 +83,17 @@ router.get('/qam/:sort', async (req, res) => {
             }
         }      
     }
-    if(sort == "Comment"){
-        ideas.sort((a, b) => (a.commentNumber > b.commentNumber) ? 1 : -1)
+    if(sort == "comment"){
+        ideas.sort((a, b) => (b.commentNumber > a.commentNumber) ? 1 : -1)
     }
-    if(sort == "Rating"){
-        ideas.sort((a, b) => (a.rating > b.rating) ? 1 : -1)
+    if(sort == "rating"){
+        ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
     }
     res.render('quality_assurance_manager',{model:ideas})
 })
 
+<<<<<<< HEAD
+=======
 //Test add comment
 
 router.post('/qam/addComment',async (req,res)=>{
@@ -115,6 +120,7 @@ router.get('/deleteIdea/:id', async (req, res) => {
     res.redirect('/admin/ideas')
 })
 
+>>>>>>> e7753d30fdcd1b7c443ac6546d3151abd22bd2c0
 router.get('/ideaDetail/:id', async (req, res) => {
     const id = req.params.id
     const idea = await getDocumentById(id, "Idea")

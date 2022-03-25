@@ -10,7 +10,7 @@ const router = express.Router()
 //     secret: 'secret', 
 //     cookie: { maxAge: 10}}));
 
-router.get("/login", async (req,res)=>{
+router.get("/", async (req,res)=>{
     res.render('login');
 })
 

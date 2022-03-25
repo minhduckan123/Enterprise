@@ -47,7 +47,7 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
             category:category,
             file: file,
             views: 0,
-            date: new Date(Date.now()).toLocaleString()
+                                                                                                                                    
         }
         await insertObject("Idea", objectToInsert)
     } catch (error) {

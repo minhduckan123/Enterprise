@@ -84,6 +84,7 @@ router.get('/ideas', async (req, res) => {
     const users = await getDocument("Users")
     const categories = await getDocument("Category")
     const comments = await getDocument("Comment")
+    const ratings = await getDocument("Rating")
     for (const idea of ideas) {
         let commentNumber = 0
         for (const comment of comments) {
@@ -98,6 +99,21 @@ router.get('/ideas', async (req, res) => {
                 idea['user'] = user.userName
             }
         }
+
+        let likeNumber = 0
+        let dislikeNumber = 0
+        for (const rate of ratings) {
+            if (idea._id == rate.ideaId) {
+                if (rate.rate == "Like") {
+                    likeNumber += 1
+                }
+                else if (rate.rate == "Dislike") {
+                    dislikeNumber += 1
+                }
+            }
+        }
+        idea['likeNumber'] = likeNumber
+        idea['dislikeNumber'] = dislikeNumber
     }
 
     res.render('staff', { model: ideas, categories:categories })

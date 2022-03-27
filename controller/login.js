@@ -44,7 +44,7 @@ router.post('/doLogin', async (req,res)=>{
 
 router.get('/logout', function(req, res) {
     res.clearCookie('userId');
-    res.redirect("/login/login");
+    res.redirect("/login");
 });
 
 module.exports = router;

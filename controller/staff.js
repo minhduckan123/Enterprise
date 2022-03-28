@@ -276,6 +276,9 @@ router.post('/ideaDetail/addComment',async (req,res)=>{
         await insertObject("Comment", objectToInsert)
         res.redirect('/staff/ideaDetail/' + ideaId)
     }
+    else{
+        res.redirect('/staff/ideaDetail/' + ideaId)
+    }
 })
 
 router.post('/rate/:id', async (req,res)=>{

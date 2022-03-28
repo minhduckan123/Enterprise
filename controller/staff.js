@@ -255,17 +255,27 @@ router.get('/deleteComment/:id', async (req, res) => {
 })
 
 router.post('/ideaDetail/addComment',async (req,res)=>{
-    const text = req.body.txtComment
-    const ideaId = req.body.ideaId
-    const userId = req.body.userId
-    const objectToInsert = {
-        text: text,
-        ideaId: ideaId,
-        userId: userId,
-        date: new Date(Date.now())
+    const course = req.body.txtCourse
+    const courseObjects = await getDocumentByAttribute("Course", "courseName", course)
+    const commentDate = new Date(Date.now())
+    const commentDateTime = commentDate.getTime()
+    let courseDateTime = ""
+    for(const courseObject of courseObjects){
+        courseDateTime = courseObject.deadLine2Time
     }
-    await insertObject("Comment", objectToInsert)
-    res.redirect('/staff/ideaDetail/' + ideaId)
+    if(commentDateTime < courseDateTime){
+        const text = req.body.txtComment
+        const ideaId = req.body.ideaId
+        const userId = req.body.userId
+        const objectToInsert = {
+            text: text,
+            ideaId: ideaId,
+            userId: userId,
+            date: new Date(Date.now())
+        }
+        await insertObject("Comment", objectToInsert)
+        res.redirect('/staff/ideaDetail/' + ideaId)
+    }
 })
 
 router.post('/rate/:id', async (req,res)=>{

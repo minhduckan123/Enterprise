@@ -63,6 +63,8 @@ router.get('/:sort', async (req, res) => {
     res.render('quality_assurance_manager',{model:ideas})
 
     //For dashboard
+    //Get year
+    
     
 })
 

@@ -39,7 +39,7 @@ async function getDocument(collectionName){
 
 async function getDocumentWithCondition(collectionName, limit, sort){
     const dbo = await getDB()
-    const results = await dbo.collection(collectionName).find({}).sort({sort:1}).limit(10).toArray();
+    const results = await dbo.collection(collectionName).find({}).sort({sort:1}).toArray();
     return results;
 }
 

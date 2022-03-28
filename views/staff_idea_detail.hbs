@@ -151,55 +151,5 @@
                     
                     
     </div>
-    <br><br> 
-    <br><br>
-    <div class="container">
-        <canvas id="myChart"></canvas>
-    </div>       
-    <br><br>
-    
-    <div class="jumbotron text-center" style="margin-bottom:0">
-        <p>Footer</p>
-    </div>
-    <script>
-    
-        var ctx = document.getElementById("myChart").getContext("2d");
-
-        var data = {
-            labels: ["2014", "2015", "2016"],
-            datasets: [
-                {
-                    label: "Táo",
-                    backgroundColor: "blue",
-                    data: [3,7,4]
-                },
-                {
-                    label: "Cam",
-                    backgroundColor: "red",
-                    data: [4,3,5]
-                },
-                {
-                    label: "Lê",
-                    backgroundColor: "green",
-                    data: [7,2,6]
-                }
-            ]
-        };
-
-        var myBarChart = new Chart(ctx, {
-            type: 'bar',
-            data: data,
-            options: {
-                barValueSpacing: 20,
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            min: 0,
-                        }
-                    }]
-                }
-            }
-        });
-      </script>
 </body>
 </html>

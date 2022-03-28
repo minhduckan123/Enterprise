@@ -258,7 +258,9 @@ router.get('/deleteComment/:id', async (req, res) => {
 })
 
 router.post('/ideaDetail/addComment',async (req,res)=>{
-    const course = req.body.txtCourse
+    const ideaId = req.body.ideaId
+    const idea = await getDocumentById(ideaId, "Idea")
+    const course = idea.course
     const courseObjects = await getDocumentByAttribute("Course", "courseName", course)
     const commentDate = new Date(Date.now())
     const commentDateTime = commentDate.getTime()
@@ -267,8 +269,7 @@ router.post('/ideaDetail/addComment',async (req,res)=>{
         courseDateTime = courseObject.deadLine2Time
     }
     if(commentDateTime < courseDateTime){
-        const text = req.body.txtComment
-        const ideaId = req.body.ideaId
+        const text = req.body.txtComment      
         const userId = req.body.userId
         const objectToInsert = {
             text: text,

@@ -121,6 +121,7 @@ router.get('/ideas', async (req, res) => {
                 idea['user'] = user.userName
             }
         }
+
     }
 
     res.render('staff', { model: ideas, categories:categories })

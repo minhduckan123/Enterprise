@@ -4,7 +4,7 @@ const {MongoClient,ObjectId} = require('mongodb')
 
 async function authLogIn(req, res, next) {
     if (!req.signedCookies.userId){
-        res.redirect("/login/login")
+        res.redirect("/login")
         return;
     }
     
@@ -12,7 +12,7 @@ async function authLogIn(req, res, next) {
     var user = await dbo.collection("Users").find({_id:req.signedCookies.userId});    
 
     if(!user) {
-        res.redirect("/login/login")
+        res.redirect("/login")
         return;
     }
 

@@ -49,6 +49,8 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
             const course = req.body.txtCourse
             const category = req.body.txtCategory
             const file = req.files
+            const userObject =  await getDocumentById(user, "Users")
+            const department = userObject.department
             //Lay user
             //Lay department cua user
             //Lay tat ca qac cua department do (Goi db)
@@ -59,6 +61,7 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
                 idea: idea,
                 course: course,
                 category:category,
+                department:department,
                 file: file,
                 views: 0,
                 date: new Date(Date.now())

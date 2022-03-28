@@ -61,6 +61,9 @@ router.get('/:sort', async (req, res) => {
         ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
     }
     res.render('quality_assurance_manager',{model:ideas})
+
+    //For dashboard
+    
 })
 
 router.get('/ideaDetail/:id', async (req, res) => {

@@ -40,14 +40,16 @@ router.post('/addUsers',async (req,res)=>{
     const pass = req.body.txtPass
     const role = req.body.txtRole
     const email = req.body.txtEmail
+    const department = req.body.txtDepartment
     const objectToInsert = {
         userName: name,
         password: pass,
         role: role,
         email: email,
+        department: department
     }
     await insertObject("Users", objectToInsert)
-    res.redirect('/admin/addUser')
+    res.redirect('/admin/addUsers')
 })
 
 router.get('/deleteUser/:id', async (req, res) => {
@@ -123,14 +125,16 @@ router.post('/update', async (req, res) => {
     const pass = req.body.txtPassword
     const role = req.body.txtRole
     const email = req.body.txtEmail
+    const department = req.body.txtDepartment
     let updateValues = { $set: {
         userName: name,
         password: pass,
         role: role,
-        email: email
+        email: email,
+        department: department
     } };
     await updateDocument(id, updateValues, "Users")
-    res.redirect('/admin/users')
+    res.redirect('/admin/addUsers')
 })
 
 

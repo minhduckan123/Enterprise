@@ -26,6 +26,7 @@
                             <th>Username</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>Department</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -35,6 +36,7 @@
                             <td>{{userName}}</td>
                             <td>{{email}}</td>
                             <td>{{role}}</td>
+                            <td>{{department}}</td>
                             <td>
                                 <a href="">Edit</a>
                                 <a href="">Delete</a>
@@ -82,6 +84,15 @@
                                         <option>Quality Assurance Manager</option>
                                         <option >Quality Assurance Coordinator </option>
                                         <option >Staff</option>
+                                    </select>
+                                </div>
+                                <label for="department" class="col-form-label">Department</label>
+                                <div class="">
+                                    <select class="form-select border border-default rounded" aria-label="Default select example" name="txtDepartment">
+                                        <option>None</option>
+                                        <option>Intelligent Technology</option>
+                                        <option >Business </option>
+                                        <option >Design</option>
                                     </select>
                                 </div>
                             </div>

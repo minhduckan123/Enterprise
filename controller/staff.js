@@ -283,7 +283,7 @@ router.post('/ideaDetail/addComment',async (req,res)=>{
 
 router.post('/rate/:id', async (req,res)=>{
     const ideaId = req.params.id //Dung hidden field
-    const userId = 1 //Truyen vao tu token
+    const userId = req.signedCookies.userId //Truyen vao tu token
     const rate = req.body.rate
     const ratings = await getDocument("Rating")
     let exist = 0
@@ -308,7 +308,7 @@ router.post('/rate/:id', async (req,res)=>{
         }
         await insertObject("Rating", objectToInsert)
     }
-    res.redirect('/staff/ideas')
+    res.redirect('/staff/rating')
 })
 
 module.exports = router;

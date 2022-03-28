@@ -25,7 +25,7 @@
     </div>
     
     <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-        <a class="navbar-brand" href="/qam/qam/date">Home</a>
+        <a class="navbar-brand" href="/qam/date">Home</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
         </button>
@@ -36,9 +36,9 @@
                     Idea
                 </button>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/qam/qam/popular">Most Popular Ideas</a>
-                    <a class="dropdown-item" href="#">Most Viewed Ideas</a>
-                    <a class="dropdown-item" href="/qam/qam/date">Latest Ideas</a>
+                    <a class="dropdown-item" href="/qam/rating">Most Popular Ideas</a>
+                    <a class="dropdown-item" href="/qam/views">Most Viewed Ideas</a>
+                    <a class="dropdown-item" href="/qam/date">Latest Ideas</a>
                     <a class="dropdown-item" href="#">Latest Comments</a>
                 </div>
             </div>
@@ -85,7 +85,7 @@
                     <a href="#">
                         {{user}}
                     </a>
-                    <a href="#" class="float-right btn-tool"><i class="fas fa-times">{{date}}</i></a>
+                    <a href="#" class="float-right btn-tool"><i class="fas fa-times">{{dateShow}}</i></a>
                     </span>
                     <span class="description"></span>
                     </div>
@@ -105,7 +105,7 @@
                     {{/each}} 
                     {{#each comments}}
                     <div class="media-body" style="border:grey;border-style:solid">
-                        <h5><a href="#">{{user}}</a> {{date}}</h5>
+                        <h5><a href="#">{{user}}</a> {{dateShow}}</h5>
                         <p>{{text}}</p>
                     </div>
                     <br><br>

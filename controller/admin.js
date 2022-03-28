@@ -94,14 +94,18 @@ router.post('/addCourse',async (req,res)=>{
 
     const dl1 = req.body.txtDL1
     const deadline1 = new Date(dl1)
+    const deadLine1Time = deadline1.getTime()
 
     const dl2 = req.body.txtDL2
     const deadline2 = new Date(dl2)
+    const deadLine2Time = deadline2.getTime()
     
     const objectToInsert = {
         courseName: course,
         deadLine1: date.format(deadline1,'YYYY/MM/DD HH:mm'),
+        deadLine1Time: deadLine1Time,
         deadLine2: date.format(deadline2,'YYYY/MM/DD HH:mm'),
+        deadLine2Time: deadLine2Time
     }
     await insertObject("Course", objectToInsert)
     res.redirect('/admin/courses')

@@ -29,11 +29,11 @@ router.post('/doLogin', async (req,res)=>{
     res.cookie('userId', user._id, {signed:true, expires: new Date(Date.now() + 900000)})
 
     if(user.role == 'Quality Assurance Manager'){
-        res.redirect('/qam/qam')
+        res.redirect('/qam/date')
     }else if(user.role == 'Admin'){
         res.redirect('/admin/home')
     }else if(user.role == 'Staff'){
-        res.redirect('/staff/ideas')
+        res.redirect('/staff/date')
     // }else{
     //     res.redirect('/')
     }
@@ -44,7 +44,7 @@ router.post('/doLogin', async (req,res)=>{
 
 router.get('/logout', function(req, res) {
     res.clearCookie('userId');
-    res.redirect("/login/login");
+    res.redirect("/login");
 });
 
 module.exports = router;

@@ -32,14 +32,11 @@ router.get('/:sort', async (req, res) => {
     const comments = await getDocument("Comment")
     const ratings = await getDocument("Rating")
 
-    for(const idea of ideas) { 
-    /*    console.log(idea.date)
-        let dateShow = idea.date
-        console.log(dateShow)
-        dateShow = dateShow.toLocaleString()
-        
+    let dateShow = ""
+    for (const idea of ideas) {
+        dateShow = idea.date.toLocaleString()
         idea['dateShow'] = dateShow
-    */
+    
         let commentNumber = 0
         for(const comment of comments){
             if(idea._id == comment.ideaId){
@@ -95,7 +92,10 @@ router.get('/ideaDetail/:id', async (req, res) => {
     //const comments = await getCommentByIdea(id, "Comment")
     let commentNumber = 0
     let commentByIdea = []
+    let dateShow = ""
         for(const comment of comments){
+            dateShow = comment.date.toLocaleString()
+            comment['dateShow'] = dateShow
             if(idea._id == comment.ideaId){
                 commentNumber += 1
                 commentByIdea.push(comment)

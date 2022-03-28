@@ -70,6 +70,12 @@
                                 <option>{{category}}</option>
                                 {{/each}}
                             </select>
+                            <label for="Category" class="form-form-label">Course</label>
+                            <select class="form-select border border-default rounded form-control" width="100%" aria-label="Default select example" name="txtCourse">
+                                {{#each courses}}
+                                <option>{{courseName}}</option>
+                                {{/each}}
+                            </select>
                         </div>
 
                         <div class="form-group">

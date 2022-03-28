@@ -49,5 +49,11 @@ async function getCommentByIdea(id, collectionName){
     return result;
 }
 
+async function getDocumentByAttribute(collectionName, attribute, condition){
+    const dbo = await getDB()
+    const result = await dbo.collection(collectionName).find({courseName:condition}).toArray();
+    return result;
+}
+
 module.exports = { getDB, deleteObject, insertObject,updateDocument, getDocumentById, getDocument,
-    getCommentByIdea, getDocumentWithCondition}
+    getCommentByIdea, getDocumentWithCondition, getDocumentByAttribute}

@@ -113,7 +113,7 @@
                     <a href="#">
                         {{user}}
                     </a>
-                    <a href="#" class="float-right btn-tool"><i class="fas fa-times">{{date}}</i></a>
+                    <a href="#" class="float-right btn-tool"><i class="fas fa-times">{{dateShow}}</i></a>
                     </span>
                     <span class="description"></span>
                     </div>
@@ -132,15 +132,16 @@
                     </span>
                     </form>
                     </p>
-                    <form action="addComment" method="POST">
+                    <form action="addComment" method="POST">               
                         <input class="form-control form-control-sm" type="text" placeholder="Type a comment" name="txtComment" id="">
                         <input type="text" name="ideaId" id="" value={{_id}} hidden />
-                        <input type="submit" hidden />
-                    </form>
                     {{/each}} 
+                        <input type="text" name="userId" value="{{userId}}" >
+                        <input type="submit">
+                    </form> 
                     {{#each comments}}
                     <div class="media-body" style="border:grey;border-style:solid">
-                        <h5><a href="#">{{user}}</a> {{date}}</h5>
+                        <h5><a href="#">{{user}}</a> {{dateShow}}</h5>
                         <p>{{text}}</p>
                     </div>
                     <br><br>

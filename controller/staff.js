@@ -4,6 +4,7 @@ const router = express.Router()
 const multer = require("multer");
 const { route } = require('express/lib/application');
 const path = require('path')
+const nodemailer = require('nodemailer');
 
 router.get('/addIdea', async (req, res) => {
     const categories = await getDocument("Category")
@@ -38,23 +39,36 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
     const ideaDate = new Date(Date.now())
     const ideaDateTime = ideaDate.getTime()
     let courseDateTime = ""
+    const qacMailList = []
+
+    const user = req.body.txtUser
+    const idea = req.body.txtIdea
+    //const course = req.body.txtCourse
+    const category = req.body.txtCategory
+    const file = req.files
+
+
+    const userObject =  await getDocumentById(user, "Users")
+    const userName = userObject.userName
+    const department = userObject.department
+    const qac = 'Quality Assurance Coordinator'
+    const dbo = await getDB()
+    const qacToMail = await dbo.collection('Users').find({$and: [{department:department},{role:qac}]}).toArray()
+    
+    for(const qactomail of qacToMail){
+        const qacMail = qactomail.email
+        qacMailList.push(qacMail)
+    }
+    //Lay user
+    //Lay department cua user
+    //Lay tat ca qac cua department do (Goi db)
+    //Lay email cua cac qac do
+
     for(const courseObject of courseObjects){
         courseDateTime = courseObject.deadLine1Time
     }
     if(ideaDateTime < courseDateTime){
         try {
-            const user = req.body.txtUser
-            const idea = req.body.txtIdea
-            const course = req.body.txtCourse
-            const category = req.body.txtCategory
-            const file = req.files
-            const userObject =  await getDocumentById(user, "Users")
-            const department = userObject.department
-            //Lay user
-            //Lay department cua user
-            //Lay tat ca qac cua department do (Goi db)
-            //Lay email cua cac qac do
-    
             const objectToInsert = {
                 user: user,
                 idea: idea,
@@ -66,31 +80,35 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
                 date: new Date(Date.now())
             }
             await insertObject("Idea", objectToInsert)
+
+            //SEND AUTOMATIC EMAIL
+            const transport = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: 'group4enterprise2022@gmail.com',
+                    pass: 'group45678',
+                },
+            });
+
+            
+            for(const emai of qacMailList){
+                const mailOptions = {
+                    from: 'group4enterprise2022@gmail.com',
+                    to: emai,
+                    subject: 'This is an automatic email. Please do not reply',
+                    html: ` A staff (${userName}) from ${department} department just submitted 1 idea for ${course} course. 
+                            Login to system for more details.`,
+                };
+                transport.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.log(error);
+                    }
+                    console.log('Email sent: ' + info.response);
+                });
+            }
         } catch (error) {
             console.log(error)
         }
-    
-            
-        const nodemailer = require('nodemailer');
-        const transport = nodemailer.createTransport({
-            service: 'Gmail',
-            auth: {
-                user: 'group4enterprise2022@gmail.com',
-                pass: 'group45678',
-            },
-        });
-        const mailOptions = {
-            from: 'group4enterprise2022@gmail.com',
-            to: 'group4enterprise2022@gmail.com',
-            subject: 'New Idea',
-            html: 'A staff submited a new Idea',
-        };
-        transport.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log(error);
-            }
-            console.log('Email sent: ' + info.response);
-        });
         res.redirect('/staff/rating')
     }
     else{
@@ -189,6 +207,7 @@ router.get('/ideaDetail/:id', async (req, res) => {
     const comments = await getDocument("Comment")
     const ratings = await getDocument("Rating")
     const userId = req.session.userId
+
     //const comments = await getCommentByIdea(id, "Comment")
     let commentNumber = 0
     let commentByIdea = []
@@ -225,7 +244,7 @@ router.get('/ideaDetail/:id', async (req, res) => {
 
     for (const user of users) {
         if (user._id == idea.user) {
-            idea['user'] = user.userName
+            idea['username'] = user.userName
         }
     }
 
@@ -281,7 +300,35 @@ router.post('/ideaDetail/addComment',async (req,res)=>{
             date: new Date(Date.now())
         }
         await insertObject("Comment", objectToInsert)
+
+        //SEND AUTOMATIC EMAIL
+        const userIdeaID = req.body.userIdeaID
+        const userOfIdea = await getDocumentById(userIdeaID, 'Users')
+        const userOfComment = await getDocumentById(userId, 'Users')
+        const transport = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: 'group4enterprise2022@gmail.com',
+                pass: 'group45678',
+            },
+        });
+
+        const mailOptions = {
+            from: 'group4enterprise2022@gmail.com',
+            to: userOfIdea.email,
+            subject: 'This is an automatic email. Please do not reply',
+            html: ` A staff (${userOfComment.userName}) from ${userOfComment.department} department just commented on your idea of ${course} course. 
+                    Login to system for more details.`,
+        };
+        transport.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+            }
+            console.log('Email sent: ' + info.response);
+        });
+
         res.redirect('/staff/ideaDetail/' + ideaId)
+        
     }
     else{
         res.redirect('/staff/ideaDetail/' + ideaId)

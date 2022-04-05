@@ -7,7 +7,11 @@ router.get('/qac', async (req, res) => {
     const ideas = await getDocumentWithCondition("Idea", 10, "_id")
     const users = await getDocument("Users")
     const comments = await getDocument("Comment")
+    let dateShow = ""
     for(const idea of ideas) { 
+        dateShow = idea.date.toLocaleString()
+        idea['dateShow'] = dateShow
+
         let commentNumber = 0
         for(const comment of comments){
             if(idea._id == comment.ideaId){
@@ -22,7 +26,7 @@ router.get('/qac', async (req, res) => {
             }
         }      
     }
-    res.render('quality_assurance_coordinator',{model:ideas})
+    res.render('qac/quality_assurance_coordinator',{model:ideas})
 })
 
 router.get('/:sort', async (req, res) => {
@@ -74,13 +78,11 @@ router.get('/:sort', async (req, res) => {
             }
         }      
     }
-    if(sort == "comment"){
-        ideas.sort((a, b) => (b.commentNumber > a.commentNumber) ? 1 : -1)
-    }
+
     if(sort == "rating"){
         ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
     }
-    res.render('quality_assurance_coordinator',{model:ideas})
+    res.render('qac/quality_assurance_coordinator',{model:ideas})
 })
 
 router.get('/ideaDetail/:id', async (req, res) => {
@@ -89,18 +91,25 @@ router.get('/ideaDetail/:id', async (req, res) => {
     const users = await getDocument("Users")
     const comments = await getDocument("Comment")
     const ratings = await getDocument("Rating")
+    const userId = req.session.userId
     //const comments = await getCommentByIdea(id, "Comment")
     let commentNumber = 0
     let commentByIdea = []
     let dateShow = ""
-        for(const comment of comments){
-            dateShow = comment.date.toLocaleString()
-            comment['dateShow'] = dateShow
-            if(idea._id == comment.ideaId){
-                commentNumber += 1
-                commentByIdea.push(comment)
-            }      
+    for(const comment of comments){
+        for (const user of users) {
+            if (user._id == comment.userId) {
+                comment['user'] = user.userName
+            }
         }
+
+        dateShow = comment.date.toLocaleString()
+        comment['dateShow'] = dateShow
+        if(idea._id == comment.ideaId){
+            commentNumber += 1
+            commentByIdea.push(comment)
+        }      
+    }
     idea['commentNumber'] = commentNumber
     let likeNumber = 0
     let dislikeNumber = 0
@@ -122,9 +131,12 @@ router.get('/ideaDetail/:id', async (req, res) => {
             idea['user'] = user.userName
         }
     }
+
+    idea['dateShow'] = idea.date.toLocaleString()
+    
     //Increase view
     let updateValues = { $set: {
-        userId: idea.user,
+        userId: idea.userId,
         idea: idea.idea,
         course: idea.course,
         file : idea.file,
@@ -135,8 +147,8 @@ router.get('/ideaDetail/:id', async (req, res) => {
 
     let ideas = []
     ideas.push(idea)
-    console.log(commentByIdea)
-    res.render('quality_assurance_manager_idea_detail',{model:ideas, comments:commentByIdea})
+
+    res.render('qac/quality_assurance_coordinator_idea_detail',{model:ideas, comments:commentByIdea})
 })
 
 module.exports = router;

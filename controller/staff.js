@@ -3,15 +3,14 @@ const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument
 const router = express.Router()
 const multer = require("multer");
 const { route } = require('express/lib/application');
-const async = require('hbs/lib/async');
 const path = require('path')
 
 router.get('/addIdea', async (req, res) => {
     const categories = await getDocument("Category")
     const courses = await getDocument("Course")
-    const userId = req.signedCookies.userId
+    const userId = req.session.userId
 
-    res.render('staff_add_idea', {categories:categories, courses:courses, userId:userId})
+    res.render('staff/staff_add_idea', {categories:categories, courses:courses, userId:userId})
 })
 
 const storage = multer.diskStorage({
@@ -127,7 +126,7 @@ router.get('/ideas', async (req, res) => {
 
     }
 
-    res.render('staff', { model: ideas, categories:categories })
+    res.render('staff/staff', { model: ideas, categories:categories })
 })
 
 
@@ -179,7 +178,7 @@ router.get('/:sort', async (req, res) => {
         ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
     }
 
-    res.render('staff', { model: ideas })
+    res.render('staff/staff', { model: ideas })
 })
 
 //Idea detail
@@ -189,25 +188,25 @@ router.get('/ideaDetail/:id', async (req, res) => {
     const users = await getDocument("Users")
     const comments = await getDocument("Comment")
     const ratings = await getDocument("Rating")
-    const userId = req.signedCookies.userId
+    const userId = req.session.userId
     //const comments = await getCommentByIdea(id, "Comment")
     let commentNumber = 0
     let commentByIdea = []
     let dateShow = ""
-        for(const comment of comments){
-            for (const user of users) {
-                if (user._id == comment.userId) {
-                    comment['user'] = user.userName
-                }
+    for(const comment of comments){
+        for (const user of users) {
+            if (user._id == comment.userId) {
+                comment['user'] = user.userName
             }
-
-            dateShow = comment.date.toLocaleString()
-            comment['dateShow'] = dateShow
-            if(idea._id == comment.ideaId){
-                commentNumber += 1
-                commentByIdea.push(comment)
-            }      
         }
+
+        dateShow = comment.date.toLocaleString()
+        comment['dateShow'] = dateShow
+        if(idea._id == comment.ideaId){
+            commentNumber += 1
+            commentByIdea.push(comment)
+        }      
+    }
     idea['commentNumber'] = commentNumber
     let likeNumber = 0
     let dislikeNumber = 0
@@ -229,6 +228,9 @@ router.get('/ideaDetail/:id', async (req, res) => {
             idea['user'] = user.userName
         }
     }
+
+    idea['dateShow'] = idea.date.toLocaleString()
+    
     //Increase view
     let updateValues = { $set: {
         userId: idea.userId,
@@ -242,13 +244,14 @@ router.get('/ideaDetail/:id', async (req, res) => {
 
     let ideas = []
     ideas.push(idea)
-    res.render('staff_idea_detail',{model:ideas, comments:commentByIdea, userId:userId})
+    
+    res.render('staff/staff_idea_detail',{model:ideas, comments:commentByIdea, userId:userId})
 })
 
 router.get('/comment/:id', async (req, res) => {
     const idValue = req.params.id
     const comments = await getCommentByIdea(idValue ,"Comment")
-    res.render('comment',{model:comments})
+    res.render('staff/comment',{model:comments})
 })
 
 router.get('/deleteComment/:id', async (req, res) => {
@@ -287,7 +290,7 @@ router.post('/ideaDetail/addComment',async (req,res)=>{
 
 router.post('/rate/:id', async (req,res)=>{
     const ideaId = req.params.id //Dung hidden field
-    const userId = req.signedCookies.userId //Truyen vao tu token
+    const userId = req.session.userId //Truyen vao tu token
     const rate = req.body.rate
     const ratings = await getDocument("Rating")
     let exist = 0

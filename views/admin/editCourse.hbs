@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../css/adminSetDate.css">
+    <title>Edit User</title>
+</head>
+<body>
+    <div class="container-fluid">
+    {{> adminHeader}}
+    <div class="container mt-3">
+        <div class="right-content">
+            <div>
+                <h3>User Accounts</h3>
+            </div>
+
+            <div>
+                <form action="/admin/editCourse" method="POST">
+                <input type="text" name="txtId" value="{{course._id}}" hidden>
+                        <div class="mb-3 row">
+                            <label for="Course" class="col-sm-3 col-form-label">Course</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="txtCourse" value="{{course.courseName}}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="deadline1" class="col-sm-3 col-form-label">First closure date</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" value="{{course.deadLine1}}" disabled>
+                            </div>
+                            <br></br>
+                            <label for="deadline1" class="col-sm-3 col-form-label">New First closure date</label>
+                            <div class="col-sm-8">
+                                <input type="datetime-local" class="form-control" name="txtDL1" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="deadline2" class="col-sm-3 col-form-label">Final closure date</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" value="{{course.deadLine2}}" disabled>
+                            </div>
+                            <br></br>
+                            <label for="deadline2" class="col-sm-3 col-form-label">New Final closure date</label>
+                            <div class="col-sm-8">
+                                <input type="datetime-local" class="form-control" name="txtDL2" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+</html>

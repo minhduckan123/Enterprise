@@ -55,5 +55,11 @@ async function getDocumentByAttribute(collectionName, attribute, condition){
     return result;
 }
 
+async function getDocumentForChart(collectionName, department, year){
+    const dbo = await getDB();
+    const result = await dbo.collection(collectionName).find({$and:[{department:department},{date: {$gte: new Date(year - 1, 12, 31), $lt: new Date(year + 1,1,1)}}]}).toArray();
+    return result;
+}
+
 module.exports = { getDB, deleteObject, insertObject,updateDocument, getDocumentById, getDocument,
-    getCommentByIdea, getDocumentWithCondition, getDocumentByAttribute}
+    getCommentByIdea, getDocumentWithCondition, getDocumentByAttribute, getDocumentForChart}

@@ -3,13 +3,14 @@ const {DATABASE_NAME, getDB, getDocumentById, getDocument} = require('../model/d
 const {MongoClient,ObjectId} = require('mongodb')
 
 async function authLogIn(req, res, next) {
-    if (!req.signedCookies.userId){
-        res.redirect("/login")
-        return;
+    const userId = req.session.userId
+
+    if (!userId) {
+        return res.redirect('/login');
     }
     
     var dbo = await getDB()
-    var user = await dbo.collection("Users").find({_id:req.signedCookies.userId});    
+    var user = await dbo.collection("Users").find({_id:userId});     
 
     if(!user) {
         res.redirect("/login")
@@ -20,18 +21,7 @@ async function authLogIn(req, res, next) {
 };
 
 async function isAdmin(req, res, next) {
-    var id = req.signedCookies.userId
-    var user = await getDocumentById(id, "Users");  
-
-    if(user.role === 'Admin'){
-        next()
-    }else {
-        res.json('ERROR: You do not have the permission to access this page')
-    }
-}
-
-async function isAdmin(req, res, next) {
-    var id = req.signedCookies.userId
+    const id = req.session.userId
     var user = await getDocumentById(id, "Users");  
 
     if(user.role === 'Admin'){
@@ -42,7 +32,7 @@ async function isAdmin(req, res, next) {
 }
 
 async function isQAM(req, res, next) {
-    var id = req.signedCookies.userId
+    var id = req.session.userId
     var user = await getDocumentById(id, "Users");  
 
     if(user.role === 'Quality Assurance Manager'){
@@ -53,7 +43,7 @@ async function isQAM(req, res, next) {
 }
 
 async function isQAC(req, res, next) {
-    var id = req.signedCookies.userId
+    var id = req.session.userId
     var user = await getDocumentById(id, "Users");  
 
     if(user.role === 'Quality Assurance Coordinator'){
@@ -64,7 +54,7 @@ async function isQAC(req, res, next) {
 }
 
 async function isStaff(req, res, next) {
-    var id = req.signedCookies.userId
+    var id = req.session.userId
     var user = await getDocumentById(id, "Users");  
 
     if(user.role === 'Staff'){

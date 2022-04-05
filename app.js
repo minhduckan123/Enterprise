@@ -11,15 +11,24 @@ app.use(express.static(publicDir));
 
 var partialDir = require('path').join(__dirname,'/views/partials');
 hbs.registerPartials(partialDir)
+hbs.registerHelper("compare", function(value1, value2, options){
+    if (value1 > value2){
+        return options.fn(this);
+    }else{
+        return options.inverse(this);
+    }
+})
 
-// var uploadDir = require('path').join(__dirname,'/uploads');
-// app.use(express.static(uploadDir))
+var session = require('express-session');
+app.use(session({
+    resave: true, 
+    saveUninitialized: false, 
+    secret: 'secret', 
+    cookie: { secure:false, httpOnly:true, maxAge: 900000}}));
+
 
 var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended:false}))
-
-var cookieParser = require('cookie-parser')
-app.use(cookieParser('abc9d$67#sdvdJisY'))
 
 var authMiddleware = require("./middleware/auth.middleware")
 
@@ -40,7 +49,7 @@ const qamController = require('./controller/qam')
 app.use('/qam', authMiddleware.authLogIn, authMiddleware.isQAM, qamController)
 
 const qacController = require('./controller/qac')
-app.use('/qac', authMiddleware.authLogIn, authMiddleware.isQAM, qacController)
+app.use('/qac', authMiddleware.authLogIn, authMiddleware.isQAC, qacController)
 
 
 

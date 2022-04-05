@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    {{> qacHeader}}
+    
+    <div class="container" style="margin-top:30px">
+        {{#each model}} 
+        <div class="row mb-5" >
+            <div class="border container rounded-3 p-5">
+                <div class="row">
+                    <div class="col-1">
+				    	<i class="far fa-user-circle fa-3x"></i>
+				    </div>
+                    <div class="col-6">
+				    	<div class="row"> <a href="/qac/ideaDetail/{{this._id}}" class="">{{user}}</a> </div>
+				    	<div class="row">{{dateShow}}</div>
+				    </div>
+                </div>
+                <div class="row mt-2 ml-1">
+                    <h4 class="description">{{idea}}</h4>
+                </div>
+
+                {{#each file}}
+                    <a href="../../uploads/{{filename}}" target="_blank" class="ml-1">{{filename}}<br></a>
+                {{/each}}
+
+                <p>
+                    <form action="rate/{{_id}}" method="post">
+                        <button type="submit" name="rate" value="Like" class="btn-link"><i class="far fa-thumbs-up"></i>{{likeNumber}} Like</button>
+                        <button type="submit" name="rate" value="Dislike" class="btn-link"><i class="far fa-thumbs-down"></i>{{dislikeNumber}} Dislike</button>
+                    
+                        <span class="float-right">
+                            <a href="ideaDetail/{{_id}}" class="link-black text-sm">
+                                <i class="far fa-comments mr-1">Comments ({{commentNumber}})</i> 
+                            </a>
+                        </span>
+                    </form>
+                </p>
+            </div>
+            <br><br>
+        </div>
+        {{/each}} 
+    </div>
+
+    <br><br>
+    
+    <div class="jumbotron text-center" style="margin-bottom:0">
+        <p>Footer</p>
+    </div>
+
+</body>
+</html>

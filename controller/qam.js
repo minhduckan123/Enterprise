@@ -171,7 +171,7 @@ router.get('/ideaDetail/:id', async (req, res) => {
 
 router.get('/dashboard', async(req, res)=>{
     let charts =[]
-
+    
     for(let i = 2019; i<2023; i++){
         let IT = await getDocumentForChart("Idea", "Intelligent Technology", i)
         let Business = await getDocumentForChart("Idea", "Business", i)
@@ -179,6 +179,45 @@ router.get('/dashboard', async(req, res)=>{
         let ITnumber = IT.length
         let BusinessNumber = Business.length
         let DesignNumber = Design.length
+
+        const chart = {IT:ITnumber, Business:BusinessNumber, Design:DesignNumber, Year:i}
+        charts.push(chart)
+    }
+    console.log(charts)
+    
+    const csvData = json2csvParser(charts);
+
+    fs.writeFile('./public/csv/dashboardData.csv', csvData, function(error) {
+        if (error) throw error;
+        console.log("Write csv file successfully!");
+    });
+
+    res.render('qam/quality_assurance_manager_dashboard')
+})
+
+router.get('/dashboard2', async(req, res)=>{
+    let charts =[]
+
+    for(let i = 2019; i<2023; i++){
+        let ITUser = new Set()
+        let BusinessUser = new Set()
+        let DesignUser = new Set()
+        let IT = await getDocumentForChart("Idea", "Intelligent Technology", i)
+        for(const idea of IT){
+            ITUser.add(idea.user)
+        }
+        let Business = await getDocumentForChart("Idea", "Business", i)
+        for(const idea of Business){
+            BusinessUser.add(idea.user)
+        }
+        let Design = await getDocumentForChart("Idea", "Design", i)
+        for(const idea of Design){
+            DesignUser.add(idea.user)
+
+        }
+        let ITnumber = ITUser.size
+        let BusinessNumber = BusinessUser.size
+        let DesignNumber = DesignUser.size
 
         const chart = {IT:ITnumber, Business:BusinessNumber, Design:DesignNumber, Year:i}
         charts.push(chart)

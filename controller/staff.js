@@ -1,5 +1,5 @@
 const express = require('express')
-const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument, getDocumentWithCondition, getCommentByIdea,getDocumentByAttribute, getDB} = require('../model/databaseControl')
+const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument, getDocumentWithCondition, getCommentByIdea,getDocumentByAttribute, getDB, getDocumentSortByDate,getDocumentSortByViews} = require('../model/databaseControl')
 const router = express.Router()
 const multer = require("multer");
 const { route } = require('express/lib/application');
@@ -34,6 +34,7 @@ const upload = multer({
 })
 
 router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
+    const anonymous = req.body.anonymous
     const course = req.body.txtCourse
     const courseObjects = await getDocumentByAttribute("Course", "courseName", course)
     const ideaDate = new Date(Date.now())
@@ -71,6 +72,7 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
         try {
             const objectToInsert = {
                 user: user,
+                anonymous: anonymous,
                 idea: idea,
                 course: course,
                 category:category,
@@ -147,16 +149,154 @@ router.get('/ideas', async (req, res) => {
     res.render('staff/staff', { model: ideas, categories:categories })
 })
 
-
 //Main view all idea
-router.get('/:sort', async (req, res) => {
-    const sort = req.params.sort
-    const ideas = await getDocumentWithCondition("Idea", 100, sort)
+router.get('/view', async (req, res) => {
+    const ideas = await getDocumentSortByViews("Idea")
     const users = await getDocument("Users")
     const comments = await getDocument("Comment")
     const ratings = await getDocument("Rating")
 
     let dateShow = ""
+    for (const idea of ideas) {
+        dateShow = idea.date.toLocaleString()
+        idea['dateShow'] = dateShow
+
+        let commentNumber = 0
+        for (const comment of comments) {
+            if (idea._id == comment.ideaId) {
+                commentNumber += 1
+            }
+        }
+        idea['commentNumber'] = commentNumber
+
+        let likeNumber = 0
+        let dislikeNumber = 0
+        for (const rate of ratings) {
+            if (idea._id == rate.ideaId) {
+                if (rate.rate == "Like") {
+                    likeNumber += 1
+                }
+                else if (rate.rate == "Dislike") {
+                    dislikeNumber += 1
+                }
+            }
+        }
+        rateScore = likeNumber - dislikeNumber
+        idea['likeNumber'] = likeNumber
+        idea['dislikeNumber'] = dislikeNumber
+        idea['rateScore'] = rateScore
+
+        for (const user of users) {
+            if (user._id == idea.user) {
+                idea['user'] = user.userName
+            }
+        }
+    }
+
+    res.render('staff/staff', { model: ideas })
+})
+
+router.get('/date', async (req, res) => {
+    const ideas = await getDocumentSortByDate("Idea")
+    const users = await getDocument("Users")
+    const comments = await getDocument("Comment")
+    const ratings = await getDocument("Rating")
+
+    let dateShow = ""
+    for (const idea of ideas) {
+        dateShow = idea.date.toLocaleString()
+        idea['dateShow'] = dateShow
+
+        let commentNumber = 0
+        for (const comment of comments) {
+            if (idea._id == comment.ideaId) {
+                commentNumber += 1
+            }
+        }
+        idea['commentNumber'] = commentNumber
+
+        let likeNumber = 0
+        let dislikeNumber = 0
+        for (const rate of ratings) {
+            if (idea._id == rate.ideaId) {
+                if (rate.rate == "Like") {
+                    likeNumber += 1
+                }
+                else if (rate.rate == "Dislike") {
+                    dislikeNumber += 1
+                }
+            }
+        }
+        rateScore = likeNumber - dislikeNumber
+        idea['likeNumber'] = likeNumber
+        idea['dislikeNumber'] = dislikeNumber
+        idea['rateScore'] = rateScore
+
+        for (const user of users) {
+            if (user._id == idea.user) {
+                idea['user'] = user.userName
+            }
+        }
+    }
+    res.render('staff/staff', { model: ideas })
+})
+
+router.get('/rating', async (req, res) => {
+    const ideas = await getDocument("Idea")
+    const users = await getDocument("Users")
+    const comments = await getDocument("Comment")
+    const ratings = await getDocument("Rating")
+
+    let dateShow = ""
+    for (const idea of ideas) {
+        dateShow = idea.date.toLocaleString()
+        idea['dateShow'] = dateShow
+
+        let commentNumber = 0
+        for (const comment of comments) {
+            if (idea._id == comment.ideaId) {
+                commentNumber += 1
+            }
+        }
+        idea['commentNumber'] = commentNumber
+
+        let likeNumber = 0
+        let dislikeNumber = 0
+        for (const rate of ratings) {
+            if (idea._id == rate.ideaId) {
+                if (rate.rate == "Like") {
+                    likeNumber += 1
+                }
+                else if (rate.rate == "Dislike") {
+                    dislikeNumber += 1
+                }
+            }
+        }
+        rateScore = likeNumber - dislikeNumber
+        idea['likeNumber'] = likeNumber
+        idea['dislikeNumber'] = dislikeNumber
+        idea['rateScore'] = rateScore
+
+        for (const user of users) {
+            if (user._id == idea.user) {
+                idea['user'] = user.userName
+            }
+        }
+    }
+    ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
+
+    res.render('staff/staff', { model: ideas })
+})
+
+//Main view all idea
+router.get('/view', async (req, res) => {
+    const ideas = await getDocumentSortByViews("Idea", 100, sort)
+    const users = await getDocument("Users")
+    const comments = await getDocument("Comment")
+    const ratings = await getDocument("Rating")
+
+    let dateShow = ""
+    let dateTime = ""
     for (const idea of ideas) {
         dateShow = idea.date.toLocaleString()
         idea['dateShow'] = dateShow

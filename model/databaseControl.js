@@ -43,6 +43,30 @@ async function getDocumentWithCondition(collectionName, limit, sort){
     return results;
 }
 
+async function getDocumentSortByDate(collectionName){
+    const dbo = await getDB()
+    const results = await dbo.collection(collectionName).find({}).sort({date:-1}).toArray();
+    return results;
+}
+
+async function getDocumentSortByDateByDepartment(collectionName, department){
+    const dbo = await getDB()
+    const results = await dbo.collection(collectionName).find({department: department}).sort({date:-1}).toArray();
+    return results;
+}
+
+async function getDocumentSortByViews(collectionName){
+    const dbo = await getDB()
+    const results = await dbo.collection(collectionName).find({}).sort({views:-1}).toArray();
+    return results;
+}
+
+async function getDocumentSortByViewsByDepartment(collectionName, department){
+    const dbo = await getDB()
+    const results = await dbo.collection(collectionName).find({department: department}).sort({date:-1}).toArray();
+    return results;
+}
+
 async function getCommentByIdea(id, collectionName){
     const dbo = await getDB()
     const result = await dbo.collection(collectionName).find({ideaId:id}).toArray();
@@ -62,4 +86,5 @@ async function getDocumentForChart(collectionName, department, year){
 }
 
 module.exports = { getDB, deleteObject, insertObject,updateDocument, getDocumentById, getDocument,
-    getCommentByIdea, getDocumentWithCondition, getDocumentByAttribute, getDocumentForChart}
+    getCommentByIdea, getDocumentWithCondition, getDocumentByAttribute, getDocumentForChart, getDocumentSortByDate, getDocumentSortByViews, getDocumentSortByDateByDepartment,
+    getDocumentSortByViewsByDepartment}

@@ -20,6 +20,10 @@ var publicDir = require('path').join(__dirname,'/public');
 app.use(express.static(publicDir));
 
 
+//MONGOOSE
+var mongoose = require('mongoose')
+
+
 //HBS TEMPLATE
 var hbs = require('hbs')
 app.set('view engine','hbs')

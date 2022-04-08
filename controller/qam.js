@@ -3,36 +3,46 @@ const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument
 const router = express.Router()
 const fs = require('fs')
 const admzip = require('adm-zip')
-const { FORMERR } = require('dns')
 const json2csvParser  = require("json2csv").parse;
+
+var mongoose = require('mongoose')
+const User = require('../model/user.model')
+const Course = require('../model/course.model')
+const Category = require('../model/category.model')
+const Comment = require('../model/comment.model')
+const Rating = require('../model/rating.model')
+const Idea = require('../model/idea.model')
 
 //CATEGORY
 
 router.get('/categories', async (req,res)=>{
-    const categories = await getDocument("Category")
+    const categories = await Category.find()
     res.render('qam/categories', {model:categories})
 })
 
 router.post('/addCat',async (req,res)=>{
     const category = req.body.txtCategory
     const description = req.body.txtDescription
+
     const objectToInsert = {
+        _id: mongoose.Types.ObjectId(),
         category: category,
         description: description,
     }
-    await insertObject("Category", objectToInsert)
+    const newCategory = new Category(objectToInsert)
+    await newCategory.save()
     res.redirect('/qam/categories')
 })
 
 router.get('/deleteCat', async (req, res) => {
     const idValue = req.query.id
-    await deleteObject(idValue, "Category")
+    await Category.deleteOne({_id:idValue})
     res.redirect('/qam/categories')
 })
 
 //DOWNLOAD CSV
 router.get('/downloadCSV', async(req, res)=>{
-    const courses = await getDocument('Course')
+    const courses = await Course.find()
     const time = new Date(Date.now())
     const timeNow = time.getTime()
 
@@ -46,9 +56,9 @@ router.get('/downloadCSV', async(req, res)=>{
 
 router.get('/downloadCSV/:id', async(req, res)=>{
     const id = req.params.id
-    const course = await getDocumentById(id, "Course")
-    const ideas = await getDocument('Idea')
-    const users = await getDocument('Users')
+    const course = await Course.findById(id)
+    const ideas = await Idea.find()
+    const users = await User.find()
     let ideaToCSV = []
 
     for (const user of users){
@@ -113,10 +123,10 @@ router.get('/downloadZipFile',  (req, res)=>{
 
 router.get('/ideaDetail/:id', async (req, res) => {
     const id = req.params.id
-    const idea = await getDocumentById(id, "Idea")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const idea = await Idea.findById(id)
+    const users = await User.find()
+    const comments = await Comment.find()
+    const ratings = await Rating.find()
     //const comments = await getCommentByIdea(id, "Comment")
     let commentNumber = 0
     let commentByIdea = []
@@ -145,6 +155,7 @@ router.get('/ideaDetail/:id', async (req, res) => {
     }
     idea['likeNumber'] = likeNumber
     idea['dislikeNumber'] = dislikeNumber
+    idea['dateShow'] = idea.date.toLocaleString()
 
     for (const user of users) {
         if (user._id == idea.user) {
@@ -153,15 +164,9 @@ router.get('/ideaDetail/:id', async (req, res) => {
         }
     }
     //Increase view
-    let updateValues = { $set: {
-        userId: idea.user,
-        idea: idea.idea,
-        course: idea.course,
-        file : idea.file,
+    await Idea.findByIdAndUpdate(id, {$set:{
         views : parseInt(idea.views) + 1,
-        date: new Date(Date.now()).toLocaleString()
-    } };
-    await updateDocument(id, updateValues, "Idea") 
+    }})
 
     let ideas = []
     ideas.push(idea)
@@ -236,10 +241,10 @@ router.get('/dashboard2', async(req, res)=>{
 
 //Main view all idea
 router.get('/view', async (req, res) => {
-    const ideas = await getDocumentSortByViews("Idea")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const ideas = await Idea.find().sort({views:-1})
+    const users = await User.find()
+    const comments = await Comment.find()
+    const ratings = await Rating.find()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -282,10 +287,10 @@ router.get('/view', async (req, res) => {
 })
 
 router.get('/date', async (req, res) => {
-    const ideas = await getDocumentSortByDate("Idea")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const ideas = await Idea.find().sort({date:-1})
+    const users = await User.find()
+    const comments = await Comment.find()
+    const ratings = await Rating.find()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -323,14 +328,16 @@ router.get('/date', async (req, res) => {
             }
         }
     }
+
+    //await getUsername()
     res.render('qam/quality_assurance_manager', { model: ideas})
 })
 
 router.get('/rating', async (req, res) => {
-    const ideas = await getDocument("Idea")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const ideas = await Idea.find()
+    const users = await User.find()
+    const comments = await Comment.find()
+    const ratings = await Rating.find()
 
     let dateShow = ""
     for (const idea of ideas) {

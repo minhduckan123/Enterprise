@@ -6,9 +6,17 @@ const { route } = require('express/lib/application');
 const path = require('path')
 const nodemailer = require('nodemailer');
 
+var mongoose = require('mongoose')
+const User = require('../model/user.model')
+const Course = require('../model/course.model')
+const Category = require('../model/category.model')
+const Comment = require('../model/comment.model')
+const Rating = require('../model/rating.model')
+const Idea = require('../model/idea.model')
+
 router.get('/addIdea', async (req, res) => {
-    const categories = await getDocument("Category")
-    const courses = await getDocument("Course")
+    const categories = await Category.find()
+    const courses = await Course.find()
     const userId = req.session.userId
 
     res.render('staff/staff_add_idea', {categories:categories, courses:courses, userId:userId})
@@ -49,12 +57,10 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
     const file = req.files
 
 
-    const userObject =  await getDocumentById(user, "Users")
+    const userObject =  await User.findById(user)
     const userName = userObject.userName
     const department = userObject.department
-    const qac = 'Quality Assurance Coordinator'
-    const dbo = await getDB()
-    const qacToMail = await dbo.collection('Users').find({$and: [{department:department},{role:qac}]}).toArray()
+    const qacToMail = await User.find({department:department, role:'Quality Assurance Coordinator' })
     
     for(const qactomail of qacToMail){
         const qacMail = qactomail.email
@@ -71,6 +77,7 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
     if(ideaDateTime < courseDateTime){
         try {
             const objectToInsert = {
+                _id: mongoose.Types.ObjectId(),
                 user: user,
                 anonymous: anonymous,
                 idea: idea,
@@ -81,7 +88,9 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
                 views: 0,
                 date: new Date(Date.now())
             }
-            await insertObject("Idea", objectToInsert)
+            //await insertObject("Idea", objectToInsert)
+            const newIdea = new User(objectToInsert)
+            await newIdea.save()
 
             //SEND AUTOMATIC EMAIL
             const transport = nodemailer.createTransport({
@@ -116,37 +125,6 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
     else{
         res.redirect('/staff/date')
     }
-})
-
-
-router.get('/ideas', async (req, res) => {
-    const ideas = await getDocument("Idea")
-    const users = await getDocument("Users")
-    const categories = await getDocument("Category")
-    const comments = await getDocument("Comment")
-    let dateShow = ""
-    for (const idea of ideas) {
-        dateShow = idea.date.toLocaleString()
-        idea['dateShow'] = dateShow
-        console.log(dateShow)
-
-        let commentNumber = 0
-        for (const comment of comments) {
-            if (idea._id == comment.ideaId) {
-                commentNumber += 1
-            }
-            idea['commentNumber'] = commentNumber
-        }
-
-        for (const user of users) {
-            if (user._id == idea.user) {
-                idea['user'] = user.userName
-            }
-        }
-
-    }
-
-    res.render('staff/staff', { model: ideas, categories:categories })
 })
 
 //Main view all idea
@@ -288,65 +266,19 @@ router.get('/rating', async (req, res) => {
     res.render('staff/staff', { model: ideas })
 })
 
-//Main view all idea
-router.get('/view', async (req, res) => {
-    const ideas = await getDocumentSortByViews("Idea", 100, sort)
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
-
-    let dateShow = ""
-    let dateTime = ""
-    for (const idea of ideas) {
-        dateShow = idea.date.toLocaleString()
-        idea['dateShow'] = dateShow
-
-        let commentNumber = 0
-        for (const comment of comments) {
-            if (idea._id == comment.ideaId) {
-                commentNumber += 1
-            }
-        }
-        idea['commentNumber'] = commentNumber
-
-        let likeNumber = 0
-        let dislikeNumber = 0
-        for (const rate of ratings) {
-            if (idea._id == rate.ideaId) {
-                if (rate.rate == "Like") {
-                    likeNumber += 1
-                }
-                else if (rate.rate == "Dislike") {
-                    dislikeNumber += 1
-                }
-            }
-        }
-        rateScore = likeNumber - dislikeNumber
-        idea['likeNumber'] = likeNumber
-        idea['dislikeNumber'] = dislikeNumber
-        idea['rateScore'] = rateScore
-
-        for (const user of users) {
-            if (user._id == idea.user) {
-                idea['user'] = user.userName
-            }
-        }
-    }
-    if(sort == "rating"){
-        ideas.sort((a, b) => (b.rateScore > a.rateScore) ? 1 : -1)
-    }
-
-    res.render('staff/staff', { model: ideas })
-})
-
 //Idea detail
 router.get('/ideaDetail/:id', async (req, res) => {
     const id = req.params.id
-    const idea = await getDocumentById(id, "Idea")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const idea = await Idea.findById(id)
+    const users = await User.find()
+    const comments = await Comment.find()
+    const ratings = await Rating.find()
     const userId = req.session.userId
+
+    //Increase view
+    await Idea.findByIdAndUpdate(id, {$set:{
+        views : parseInt(idea.views) + 1,
+    }})
 
     //const comments = await getCommentByIdea(id, "Comment")
     let commentNumber = 0
@@ -389,17 +321,6 @@ router.get('/ideaDetail/:id', async (req, res) => {
     }
 
     idea['dateShow'] = idea.date.toLocaleString()
-    
-    //Increase view
-    let updateValues = { $set: {
-        userId: idea.userId,
-        idea: idea.idea,
-        course: idea.course,
-        file : idea.file,
-        views : parseInt(idea.views) + 1,
-        date: new Date(Date.now()).toLocaleString()
-    } };
-    await updateDocument(id, updateValues, "Idea") 
 
     let ideas = []
     ideas.push(idea)
@@ -407,21 +328,9 @@ router.get('/ideaDetail/:id', async (req, res) => {
     res.render('staff/staff_idea_detail',{model:ideas, comments:commentByIdea, userId:userId})
 })
 
-router.get('/comment/:id', async (req, res) => {
-    const idValue = req.params.id
-    const comments = await getCommentByIdea(idValue ,"Comment")
-    res.render('staff/comment',{model:comments})
-})
-
-router.get('/deleteComment/:id', async (req, res) => {
-    const idValue = req.params.id
-    await deleteObject(idValue, "Comment")
-    res.redirect('/staff/ideas')
-})
-
 router.post('/ideaDetail/addComment',async (req,res)=>{
     const ideaId = req.body.ideaId
-    const idea = await getDocumentById(ideaId, "Idea")
+    const idea = await Idea.findById(ideaId)
     const course = idea.course
     const courseObjects = await getDocumentByAttribute("Course", "courseName", course)
     const commentDate = new Date(Date.now())
@@ -434,17 +343,20 @@ router.post('/ideaDetail/addComment',async (req,res)=>{
         const text = req.body.txtComment      
         const userId = req.body.userId
         const objectToInsert = {
+            _id: mongoose.Types.ObjectId(),
             text: text,
             ideaId: ideaId,
             userId: userId,
             date: new Date(Date.now())
         }
-        await insertObject("Comment", objectToInsert)
+        //await insertObject("Comment", objectToInsert)
+        const newComment = new Comment(objectToInsert)
+        await newComment.save()
 
         //SEND AUTOMATIC EMAIL
         const userIdeaID = req.body.userIdeaID
-        const userOfIdea = await getDocumentById(userIdeaID, 'Users')
-        const userOfComment = await getDocumentById(userId, 'Users')
+        const userOfIdea = await User.findById(userIdeaID)
+        const userOfComment = await User.findById(userId)
         const transport = nodemailer.createTransport({
             service: 'Gmail',
             auth: {

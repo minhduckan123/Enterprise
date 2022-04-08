@@ -230,7 +230,7 @@ router.get('/ideaDetail/:id', async (req, res) => {
         course: idea.course,
         file : idea.file,
         views : parseInt(idea.views) + 1,
-        date: new Date(Date.now()).toLocaleString()
+        date: idea.date
     } };
     await updateDocument(id, updateValues, "Idea") 
 

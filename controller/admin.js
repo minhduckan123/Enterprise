@@ -1,39 +1,43 @@
 const express = require('express')
-const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument} = require('../model/databaseControl')
 const router = express.Router()
 const date = require('date-and-time')
 const bcrypt = require("bcrypt");
 
-//HOME
-router.get('/home', async (req, res) => {
-    const users = await getDocument("Users")
+var mongoose = require('mongoose')
+const User = require('../model/user.model')
+const Course = require('../model/course.model')
+
+async function getUserName(sessionID){
+    const users = await User.find()
     let username
     for(const user of users){
-        if(user._id == req.session.userId){
+        if(user._id == sessionID){
             username = user.userName        
         }
     }      
-    
-    res.render("admin/home")
+
+    return username
+}
+
+//HOME
+router.get('/home', async (req, res) => {
+    const user = await getUserName(req.session.userId)  
+   
+    res.render("admin/home", {userName: user})
 })
 
 router.get('/users/:id', async (req, res) => {
     const idValue = req.params.id
-    const user = await getDocumentById(idValue, "Users")
+    const user = await User.findById(idValue)
     res.render('users',{model:user})
 })
 
 //USER
 router.get('/addUsers', async(req,res)=>{
-    const users = await getDocument("Users")
-    let username
-    for(const user of users){
-        if(user._id == req.session.userId){
-            username = user.userName        
-        }
-    }      
-    
-    res.render("admin/addUsers", {model:users, userName:username})
+    const user = await getUserName(req.session.userId)  
+    const users = await User.find()
+
+    res.render("admin/addUsers", {model:users, userName: user})
 })
 
 router.post('/addUsers',async (req,res)=>{
@@ -46,31 +50,37 @@ router.post('/addUsers',async (req,res)=>{
     const salt = await bcrypt.genSalt(10);
 
     const objectToInsert = {
+        _id: mongoose.Types.ObjectId(),
         userName: name,
         password: await bcrypt.hash(pass, salt),
         role: role,
         email: email,
         department: department
     }
-    await insertObject("Users", objectToInsert)
+    //await insertObject("Users", objectToInsert)
+
+    const newUser = new User(objectToInsert)
+    await newUser.save()
     res.redirect('/admin/addUsers')
 })
 
 router.get('/deleteUser/:id', async (req, res) => {
     const idValue = req.params.id
-    await deleteObject(idValue, "Users")
-    res.redirect('/admin/users')
+    await User.deleteOne({_id: idValue})
+    res.redirect('/admin/addUsers')
 })
 
 router.get('/editUser/:id', async (req, res) => {
+    const user = await getUserName(req.session.userId)  
+
     const idValue = req.params.id
-    const userToEdit = await getDocumentById(idValue, "Users")
-    res.render("admin/editUser", { user: userToEdit })
+    const userToEdit = await User.findById(idValue)
+    res.render("admin/editUser", { user: userToEdit, userName: user })
 })
 
 router.post('/editUser', async (req, res) => {
     let id = req.body.txtId;
-    const name = req.body.txtName
+    const name = req.body.txtUser
     const pass = req.body.txtPass
     const role = req.body.txtRole
     const email = req.body.txtEmail
@@ -78,14 +88,19 @@ router.post('/editUser', async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
 
-    let newValues ={$set : {
+    // let newValues ={$set : {
+    //     userName: name,
+    //     password: await bcrypt.hash(pass, salt),
+    //     role: role,
+    //     email: email,
+    //     department: department}};
+    
+    await User.findByIdAndUpdate(id, {$set:{
         userName: name,
         password: await bcrypt.hash(pass, salt),
         role: role,
         email: email,
-        department: department}};
-    
-    await updateDocument(id, newValues, "Users")
+        department: department}})
     
     res.redirect("/admin/addUsers")
 })
@@ -93,28 +108,18 @@ router.post('/editUser', async (req, res) => {
 //COURSE
 
 router.get('/courses', async (req, res) => {
-    const courses = await getDocument("Course")
-    const users = await getDocument("Users")
-    let username
-    for(const user of users){
-        if(user._id == req.session.userId){
-            username = user.userName        
-        }
-    }      
+    const user = await getUserName(req.session.userId)  
 
-    res.render("admin/courses",{model:courses, userName:username})
+    const courses = await Course.find().lean()
+    const users = await User.find().lean()
+
+    res.render("admin/courses",{model:courses, userName: user})
 })
 
 router.get('/addCourse', async (req, res) => {
-    const users = await getDocument("Users")
-    let username
-    for(const user of users){
-        if(user._id == req.session.userId){
-            username = user.userName        
-        }
-    }      
+    const user = await getUserName(req.session.userId)  
 
-    res.render("admin/addCourse", {userName:username})
+    res.render("admin/addCourse", {userName: user})
 })
 
 router.post('/addCourse',async (req,res)=>{
@@ -129,26 +134,32 @@ router.post('/addCourse',async (req,res)=>{
     const deadLine2Time = deadline2.getTime()
     
     const objectToInsert = {
+        _id: mongoose.Types.ObjectId(),
         courseName: course,
         deadLine1: date.format(deadline1,'YYYY/MM/DD HH:mm'),
         deadLine1Time: deadLine1Time,
         deadLine2: date.format(deadline2,'YYYY/MM/DD HH:mm'),
         deadLine2Time: deadLine2Time
     }
-    await insertObject("Course", objectToInsert)
+    
+    const newCourse = new Course(objectToInsert)
+    await newCourse.save()
+
     res.redirect('/admin/courses')
 })
 
 router.get('/deleteCourse', async (req, res) => {
     const idValue = req.query.id
-    await deleteObject(idValue, "Course")
+    await Course.deleteOne({_id: idValue})
     res.redirect('/admin/courses')
 })
 
 router.get('/editCourse/:id', async (req, res) => {
+    const user = await getUserName(req.session.userId)  
+
     const idValue = req.params.id
-    const courseToEdit = await getDocumentById(idValue, "Course")
-    res.render("admin/editCourse", { course: courseToEdit })
+    const courseToEdit = await Course.findById(idValue)
+    res.render("admin/editCourse", { course: courseToEdit, userName: user })
 })
 
 router.post('/editCourse', async (req, res) => {
@@ -164,15 +175,13 @@ router.post('/editCourse', async (req, res) => {
     const deadline2 = new Date(dl2)
     const deadLine2Time = deadline2.getTime()
     
-    let newValues ={$set : {
+    await Course.findByIdAndUpdate(id, {$set:{
         courseName: course,
         deadLine1: date.format(deadline1,'YYYY/MM/DD HH:mm'),
         deadLine1Time: deadLine1Time,
         deadLine2: date.format(deadline2,'YYYY/MM/DD HH:mm'),
         deadLine2Time: deadLine2Time
-    }}
-    
-    await updateDocument(id, newValues, "Course")
+    }})
     
     res.redirect("/admin/courses")
 })

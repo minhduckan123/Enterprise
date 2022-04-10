@@ -14,7 +14,7 @@ router.post('/doLogin', async (req,res)=>{
     var user  = await User.findOne({userName:nameInput});
 
     const validPassword = await bcrypt.compare(passInput, user.password);
-    if(!user){  //if(!user || !validPassword)
+    if(!user || !validPassword){  //if(!user || !validPassword)
         res.render("login", {message: 'Username or password is invalid!'})
     }else{
 

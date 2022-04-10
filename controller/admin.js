@@ -40,8 +40,6 @@ router.get('/addUsers', async(req,res)=>{
     for(const user of users){
         user['currentUser'] = currentUser
     }
-    
-    console.log(users)
 
     res.render("admin/addUsers", {model:users, username: currentUser})
 })

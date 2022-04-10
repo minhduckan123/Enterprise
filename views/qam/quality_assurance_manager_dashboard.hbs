@@ -10,8 +10,49 @@
 <body>
     {{> qamHeader}}
     
-    <div class="container" style="margin-top:30px">
-        <canvas id="myChart"></canvas>
+    <div class="container-fluid" style="margin-top:30px">
+        
+        <div class="row">
+            <div class="col-8 ">
+                <canvas id="chart1" class="shadow p-3 mb-5 bg-white rounded"></canvas>
+            </div>
+            <div class="col-4">
+                <div class="row">
+                    <div class="col-lg-2 text-white pt-5 pb-5 pl-2 pr-2 text-center" style="background-color: rgb(0, 165, 186); margin-left:20%;"> 
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <div class="col-lg-5 text-white pt-5 text-uppercase text-left" style="background-color: rgb(0, 188, 212);">
+                        <h4>{{users}} Total Users</h4>
+                    </div>
+                </div>
+                <div class="w-100"><br><br></div>
+                <div class="row">
+                    <div class="col-lg-2 text-white pt-5 pb-5 pl-2 pr-2 text-center" style="background-color: rgb(205, 26, 87);margin-left:20%;"> 
+                        <i class="fas fa-tasks fa-3x"></i>
+                    </div>
+                    <div class="col-lg-5 text-white pt-5 text-uppercase text-left" style="background-color: rgb(233, 30, 99);">
+                        <h4>{{courses}} Total Courses</h4>
+                    </div>
+                </div>
+                <div class="w-100"><br><br></div>
+                <div class="row">
+                    <div class="col-lg-2 text-white pt-5 pb-5 pl-2 pr-2 text-center" style="background-color: rgb(224, 134, 0);margin-left:20%;"> 
+                        <i class="far fa-lightbulb fa-3x"></i>
+                    </div>
+                    <div class="col-lg-5 text-white pt-5 text-uppercase text-left" style="background-color: rgb(255, 152, 0);">
+                        <h4>{{ideas}} Total Ideas</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="w-100"><br><br></div>
+            <div class="col-4">
+                <canvas id="pieChart" class="shadow p-3 mb-5 bg-white rounded"></canvas>
+            </div>
+            <div class="col-8">
+                <canvas id="chart2" class="shadow p-3 mb-5 bg-white rounded"></canvas>
+            </div>
+        </div>
+
     </div>
     <br><br>
     
@@ -20,80 +61,8 @@
     </div>
 </body>
 
-    <script>
-
-        const yAxesIT = [];
-            const yAxesBu = [];
-            const yAxesDes = [];
-            const xAxes = [];
-        drawChart();
-      
-        async function drawChart(){
-            await getData();
-            const ctx = document.getElementById("myChart").getContext("2d");
-            const data = {
-                labels: xAxes,
-                datasets: [
-                    {
-                        label: "IT",
-                        backgroundColor: "blue",
-                        data: yAxesIT
-                    },
-                    {
-                        label: "Business",
-                        backgroundColor: "red",
-                        data: yAxesBu
-                    },
-                    {
-                        label: "Design",
-                        backgroundColor: "green",
-                        data: yAxesDes
-                    }
-                ]
-            };
-            const myBarChart = new Chart(ctx, {
-                type: 'bar',
-                data: data,
-                options: {
-                    barValueSpacing: 20,
-                    scales: {
-                        x: {
-                            stacked: true,
-                        },
-                        y: {
-                            stacked: true
-                        }
-                    }
-                }
-            });
-        }
-
-        async function getData(){
-            const res = await fetch('../csv/dashboardData.csv');
-            const data = await res.text();
-
-            const table = data.split('\n').slice(1);
-            table.forEach(row=>{
-                const column = row.split(',')
-
-                const year = column[3]
-                xAxes.push(year)
-                
-                const IT = column[0]
-                yAxesIT.push(IT)
-
-                const Business = column[1]
-                yAxesBu.push(Business)
-
-                const Design = column[2]
-                yAxesDes.push(Design)
-            })
-            
-
-        }
+<!--Chart -->
+<script type="module" src='../js/dashboard.js'></script>
 
 
-        
-      </script>
-    </script>
 </html>

@@ -1,5 +1,4 @@
 const express = require('express')
-const { getDB} = require('../model/databaseControl')
 const router = express.Router()
 const bcrypt = require("bcrypt");
 const User = require('../model/user.model')
@@ -12,13 +11,11 @@ router.post('/doLogin', async (req,res)=>{
     var nameInput = req.body.username;
     var passInput = req.body.password;
     
-    // const dbo = await getDB()
-    // var user  = await dbo.collection("Users").findOne({userName:nameInput});
     var user  = await User.findOne({userName:nameInput});
 
     const validPassword = await bcrypt.compare(passInput, user.password);
     if(!user){  //if(!user || !validPassword)
-        res.render("login"), {value: nameInput}
+        res.render("login", {message: 'Username or password is invalid!'})
     }else{
 
         req.session.userId = user._id

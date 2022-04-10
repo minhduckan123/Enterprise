@@ -20,12 +20,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{mess}}
                     {{#each model}}
                     <tr>
                         <td>{{category}}</td>
                         <td>{{description}}</td>
                         <td>
+                            <a href="/qam/editCat/{{this._id}}"><i class="far fa-edit fa-lg ml-1"></i>&nbsp&nbsp</a>
                             <a href="/qam/deleteCat?id={{_id}}" onclick="return confirmDelete();"><i class="fas fa-trash-alt fa-lg text-danger"></i></a>
                         </td>
                     </tr>

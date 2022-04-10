@@ -1,12 +1,19 @@
 const express = require('express')
-const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument, getDocumentWithCondition, getCommentByIdea, getDocumentSortByDateByDepartment, getDocumentSortByViewsByDepartment} = require('../model/databaseControl')
 const router = express.Router()
 
+var mongoose = require('mongoose')
+const User = require('../model/user.model')
+const Course = require('../model/course.model')
+const Category = require('../model/category.model')
+const Comment = require('../model/comment.model')
+const Rating = require('../model/rating.model')
+const Idea = require('../model/idea.model')
+
 router.get('/qac', async (req, res) => {
-    const sort = req.params.sort
-    const ideas = await getDocumentWithCondition("Idea", 10, "_id")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
+
+    const ideas = await Idea.find().lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
     let dateShow = ""
     for(const idea of ideas) { 
         dateShow = idea.date.toLocaleString()
@@ -31,11 +38,11 @@ router.get('/qac', async (req, res) => {
 
 router.get('/view', async (req, res) => {
     const userId = req.session.userId
-    const user = await getDocumentById(userId, "Users")
-    const ideas = await getDocumentSortByDateByDepartment("Idea", user.department)
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const user = await User.findById(userId).lean()
+    const ideas = await Idea.find({department: user.department}).sort({views:-1}).lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean().lean()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -79,11 +86,11 @@ router.get('/view', async (req, res) => {
 
 router.get('/date', async (req, res) => {
     const userId = req.session.userId
-    const user = await getDocumentById(userId, "Users")
-    const ideas = await getDocumentSortByDateByDepartment("Idea", user.department)
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const user = await User.findById(userId).lean()
+    const ideas = await Idea.find({department: user.department}).sort({date:-1}).lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean().lean()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -126,11 +133,11 @@ router.get('/date', async (req, res) => {
 
 router.get('/rating', async (req, res) => {
     const userId = req.session.userId
-    const user = await getDocumentById(userId, "Users")
-    const ideas = await getDocumentSortByDateByDepartment("Idea", user.department)
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const user = await User.findById(userId).lean()
+    const ideas = await Idea.find().lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean().lean()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -176,10 +183,10 @@ router.get('/rating', async (req, res) => {
 
 router.get('/ideaDetail/:id', async (req, res) => {
     const id = req.params.id
-    const idea = await getDocumentById(id, "Idea")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const idea = await Idea.findById(id).lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean()
     const userId = req.session.userId
     //const comments = await getCommentByIdea(id, "Comment")
     let commentNumber = 0
@@ -224,15 +231,9 @@ router.get('/ideaDetail/:id', async (req, res) => {
     idea['dateShow'] = idea.date.toLocaleString()
     
     //Increase view
-    let updateValues = { $set: {
-        userId: idea.userId,
-        idea: idea.idea,
-        course: idea.course,
-        file : idea.file,
+    await Idea.findByIdAndUpdate(id, {$set:{
         views : parseInt(idea.views) + 1,
-        date: idea.date
-    } };
-    await updateDocument(id, updateValues, "Idea") 
+    }})
 
     let ideas = []
     ideas.push(idea)

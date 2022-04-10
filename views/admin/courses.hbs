@@ -32,8 +32,8 @@
                                 <td>{{deadLine1}}</td>
                                 <td>{{deadLine2}}</td>
                                 <td>
-                                    <a href="/admin/editCourse/{{this._id}}">Edit</a>
-                                    <a href="/admin/deleteCourse?id={{_id}}" onclick="return confirmDelete();">Delete</a>
+                                    <a href="/admin/editCourse/{{this._id}}"><i class="far fa-edit fa-lg ml-1"></i></a>
+                                    <a href="/admin/deleteCourse?id={{_id}}" onclick="return confirmDelete();"><i class="fas fa-trash-alt fa-lg text-danger"></i></a>
                                 </td>
                             </tr>
                             {{/each}}

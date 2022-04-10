@@ -39,6 +39,14 @@ hbs.registerHelper("compare", function(value1, value2, options){
     }
 })
 
+hbs.registerHelper("compareEq", function(value1, value2, options){
+    if (value1 != value2){
+        return options.fn(this);
+    }else{
+        return options.inverse(this);
+    }
+})
+
 
 //CONTROLLERS
 var authMiddleware = require("./middleware/auth.middleware") //Authentication and authorization middleware

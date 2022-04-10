@@ -17,7 +17,11 @@
 				    	<i class="far fa-user-circle fa-3x"></i>
 				    </div>
                     <div class="col-6">
-				    	<div class="row"> <a href="/staff/ideaDetail/{{this._id}}" class="">{{user}}</a> </div>
+				    	{{#if anonymous}}
+				    	<div class="row"> <a href="/qac/ideaDetail/{{this._id}}" class="">Anonymous</a> </div>
+                        {{else}}
+                        <div class="row"> <a href="/qac/ideaDetail/{{this._id}}" class="">{{user}}</a> </div>
+                        {{/if}}
 				    	<div class="row">{{dateShow}}</div>
 				    </div>
                 </div>

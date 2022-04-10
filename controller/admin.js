@@ -8,7 +8,7 @@ const User = require('../model/user.model')
 const Course = require('../model/course.model')
 
 async function getUserName(sessionID){
-    const users = await User.find()
+    const users = await User.find().lean()
     let username
     for(const user of users){
         if(user._id == sessionID){
@@ -23,21 +23,27 @@ async function getUserName(sessionID){
 router.get('/home', async (req, res) => {
     const user = await getUserName(req.session.userId)  
    
-    res.render("admin/home", {userName: user})
+    res.render("admin/home", {username: user})
 })
 
 router.get('/users/:id', async (req, res) => {
     const idValue = req.params.id
-    const user = await User.findById(idValue)
+    const user = await User.findById(idValue).lean()
     res.render('users',{model:user})
 })
 
 //USER
 router.get('/addUsers', async(req,res)=>{
-    const user = await getUserName(req.session.userId)  
+    const currentUser = await getUserName(req.session.userId)  
     const users = await User.find()
 
-    res.render("admin/addUsers", {model:users, userName: user})
+    for(const user of users){
+        user['currentUser'] = currentUser
+    }
+    
+    console.log(users)
+
+    res.render("admin/addUsers", {model:users, username: currentUser})
 })
 
 router.post('/addUsers',async (req,res)=>{
@@ -57,7 +63,6 @@ router.post('/addUsers',async (req,res)=>{
         email: email,
         department: department
     }
-    //await insertObject("Users", objectToInsert)
 
     const newUser = new User(objectToInsert)
     await newUser.save()
@@ -75,7 +80,7 @@ router.get('/editUser/:id', async (req, res) => {
 
     const idValue = req.params.id
     const userToEdit = await User.findById(idValue)
-    res.render("admin/editUser", { user: userToEdit, userName: user })
+    res.render("admin/editUser", { user: userToEdit, username: user })
 })
 
 router.post('/editUser', async (req, res) => {
@@ -88,16 +93,8 @@ router.post('/editUser', async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
 
-    // let newValues ={$set : {
-    //     userName: name,
-    //     password: await bcrypt.hash(pass, salt),
-    //     role: role,
-    //     email: email,
-    //     department: department}};
-    
     await User.findByIdAndUpdate(id, {$set:{
         userName: name,
-        password: await bcrypt.hash(pass, salt),
         role: role,
         email: email,
         department: department}})
@@ -111,15 +108,14 @@ router.get('/courses', async (req, res) => {
     const user = await getUserName(req.session.userId)  
 
     const courses = await Course.find().lean()
-    const users = await User.find().lean()
 
-    res.render("admin/courses",{model:courses, userName: user})
+    res.render("admin/courses",{model:courses, username: user})
 })
 
 router.get('/addCourse', async (req, res) => {
     const user = await getUserName(req.session.userId)  
 
-    res.render("admin/addCourse", {userName: user})
+    res.render("admin/addCourse", {username: user})
 })
 
 router.post('/addCourse',async (req,res)=>{
@@ -158,8 +154,8 @@ router.get('/editCourse/:id', async (req, res) => {
     const user = await getUserName(req.session.userId)  
 
     const idValue = req.params.id
-    const courseToEdit = await Course.findById(idValue)
-    res.render("admin/editCourse", { course: courseToEdit, userName: user })
+    const courseToEdit = await Course.findById(idValue).lean()
+    res.render("admin/editCourse", { course: courseToEdit, username: user })
 })
 
 router.post('/editCourse', async (req, res) => {

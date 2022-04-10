@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    {{> qamHeader}}
+    
+    <div class="container" style="margin-top:30px">
+        <div>
+                <h3>Edit Category</h3>
+            </div>
+
+            <div>
+                <form action="/qam/editCat" method="POST">
+                        <input type="text" name="txtId" value="{{category._id}}" hidden>
+                                
+                        <div class="form-group">
+                            <label for="Category" class="form-check-label">Category</label>
+                            <input type="text" name="txtCategory" class="form-control" value="{{category.category}}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Description" class="form-check-label">Description</label>
+                            <input type="text" class="form-control" name="txtDescription" value="{{category.description}}" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Submit</button>
+                </form>
+            </div>
+    </div>
+    <br><br>
+
+</body>
+</html>

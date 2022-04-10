@@ -17,6 +17,11 @@ const Idea = require('../model/idea.model')
 router.get('/addIdea', async (req, res) => {
     const categories = await Category.find()
     const courses = await Course.find()
+
+    for(const course of courses){
+        course['timeNow'] = new Date(Date.now()).getTime()
+    }
+    
     const userId = req.session.userId
 
     res.render('staff/staff_add_idea', {categories:categories, courses:courses, userId:userId})
@@ -44,7 +49,7 @@ const upload = multer({
 router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
     const anonymous = req.body.anonymous
     const course = req.body.txtCourse
-    const courseObjects = await getDocumentByAttribute("Course", "courseName", course)
+    const courseObjects = await Course.findOne({courseName:course})
     const ideaDate = new Date(Date.now())
     const ideaDateTime = ideaDate.getTime()
     let courseDateTime = ""
@@ -71,10 +76,14 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
     //Lay tat ca qac cua department do (Goi db)
     //Lay email cua cac qac do
 
-    for(const courseObject of courseObjects){
-        courseDateTime = courseObject.deadLine1Time
-    }
-    if(ideaDateTime < courseDateTime){
+    // for(const courseObject of courseObjects){
+    //     courseDateTime = courseObject.deadLine1Time
+    // }
+    console.log(ideaDateTime)
+    //const time = courseObjects.deadLine1Time
+    //console.log(courseObjects.deadLine1Time)
+    console.log(courseObjects)
+    if(ideaDateTime < courseObjects.deadLine1Time){
         try {
             const objectToInsert = {
                 _id: mongoose.Types.ObjectId(),
@@ -89,8 +98,9 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
                 date: new Date(Date.now())
             }
             //await insertObject("Idea", objectToInsert)
-            const newIdea = new User(objectToInsert)
+            const newIdea = new Idea(objectToInsert)
             await newIdea.save()
+            console.log(objectToInsert)
 
             //SEND AUTOMATIC EMAIL
             const transport = nodemailer.createTransport({
@@ -120,19 +130,19 @@ router.post('/addIdea', upload.array('txtFile', 5), async (req, res) => {
         } catch (error) {
             console.log(error)
         }
-        res.redirect('/staff/rating')
+        res.redirect('/staff/date')
     }
     else{
-        res.redirect('/staff/date')
+        res.redirect('/staff/rating')
     }
 })
 
 //Main view all idea
 router.get('/view', async (req, res) => {
-    const ideas = await getDocumentSortByViews("Idea")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const ideas = await Idea.find().sort({views:-1}).lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -175,10 +185,10 @@ router.get('/view', async (req, res) => {
 })
 
 router.get('/date', async (req, res) => {
-    const ideas = await getDocumentSortByDate("Idea")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const ideas = await Idea.find().sort({date:-1}).lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -220,10 +230,10 @@ router.get('/date', async (req, res) => {
 })
 
 router.get('/rating', async (req, res) => {
-    const ideas = await getDocument("Idea")
-    const users = await getDocument("Users")
-    const comments = await getDocument("Comment")
-    const ratings = await getDocument("Rating")
+    const ideas = await Idea.find().lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -273,6 +283,7 @@ router.get('/ideaDetail/:id', async (req, res) => {
     const users = await User.find()
     const comments = await Comment.find()
     const ratings = await Rating.find()
+    const courseOfIdea = await Course.findOne({courseName:idea.course})
     const userId = req.session.userId
 
     //Increase view
@@ -322,6 +333,10 @@ router.get('/ideaDetail/:id', async (req, res) => {
 
     idea['dateShow'] = idea.date.toLocaleString()
 
+    idea['commentDate'] = new Date(Date.now()).getTime()
+    idea['courseDate'] = courseOfIdea.deadLine2Time
+
+
     let ideas = []
     ideas.push(idea)
     
@@ -332,7 +347,7 @@ router.post('/ideaDetail/addComment',async (req,res)=>{
     const ideaId = req.body.ideaId
     const idea = await Idea.findById(ideaId)
     const course = idea.course
-    const courseObjects = await getDocumentByAttribute("Course", "courseName", course)
+    const courseObjects = await Course.findOne({courseName:course})
     const commentDate = new Date(Date.now())
     const commentDateTime = commentDate.getTime()
     let courseDateTime = ""
@@ -391,18 +406,23 @@ router.post('/rate/:id', async (req,res)=>{
     const ideaId = req.params.id //Dung hidden field
     const userId = req.session.userId //Truyen vao tu token
     const rate = req.body.rate
-    const ratings = await getDocument("Rating")
+    const ratings = await Rating.find().lean()
     let exist = 0
     for (const rating of ratings) {
         if (rating.userId == userId && rating.ideaId == ideaId) {
-            let updateValues = {
-                $set: {
-                    rate: rate,
-                    ideaId: ideaId,
-                    userId: userId,
-                }
-            };
-            await updateDocument(rating._id, updateValues, "Rating")
+            // let updateValues = {
+            //     $set: {
+            //         rate: rate,
+            //         ideaId: ideaId,
+            //         userId: userId,
+            //     }
+            // };
+            await Rating.findByIdAndUpdate(rating._id, {$set:{
+                rate: rate,
+                ideaId: ideaId,
+                userId: userId,
+            }})
+            //await updateDocument(rating._id, updateValues, "Rating")
             exist = 1
         }
     }
@@ -412,7 +432,8 @@ router.post('/rate/:id', async (req,res)=>{
             ideaId: ideaId,
             userId: userId,
         }
-        await insertObject("Rating", objectToInsert)
+        const newRating = new Rating(objectToInsert)
+        await newRating.save()
     }
     res.redirect('/staff/rating')
 })

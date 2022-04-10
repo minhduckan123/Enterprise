@@ -5,6 +5,7 @@ mongoose.connect("mongodb+srv://hieunt:EarthDefender@cluster0.vwoqw.mongodb.net/
 var ideaSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     user: String,
+    anonymous: String,
     idea: String,    
     course: String,
     category: String,

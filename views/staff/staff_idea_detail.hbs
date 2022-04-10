@@ -27,8 +27,16 @@
 				    	<i class="far fa-user-circle fa-3x"></i>
 				    </div>
                     <div class="col-6">
-				    	<div class="row"> <a href="/staff/ideaDetail/{{this._id}}" class="">{{username}}</a> </div>
+                        {{#if anonymous}}
+				    	<div class="row"> <a href="/staff/ideaDetail/{{this._id}}" class="">Anonymous</a> </div>
+                        {{else}}
+                        <div class="row"> <a href="/staff/ideaDetail/{{this._id}}" class="">{{username}}</a> </div>
+                        {{/if}}
 				    	<div class="row">{{dateShow}}</div>
+				    </div>
+                    <div class="col-5">
+				    	<div class="row float-right">Course: {{course}}</div> <br>
+				    	<div class="row float-right">Category: {{category}}</div>
 				    </div>
                 </div>
                 <div class="row mt-2 ml-1">
@@ -53,7 +61,11 @@
                     </p>
                     <form action="addComment" method="POST">
                         <input type="text" name="userIdeaID" value="{{user}}" hidden>
+                        {{#compare courseDate commentDate}}
                         <input class="form-control form-control-sm" type="text" placeholder="Type a comment" name="txtComment" id="">
+                        {{else}}
+                        <input class="form-control form-control-sm" type="text" placeholder="Cannot comment because the course of this idea is due!" disabled>
+                        {{/compare}}
 
                         <input name="ideaId" id="" value="{{_id}}" hidden>
 

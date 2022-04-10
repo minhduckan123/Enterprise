@@ -1,5 +1,4 @@
 const express = require('express')
-const { insertObject, updateDocument, deleteObject, getDocumentById, getDocument, getDocumentWithCondition, getCommentByIdea, getDocumentForChart, getDocumentSortByDate, getDocumentSortByViews} = require('../model/databaseControl')
 const router = express.Router()
 const fs = require('fs')
 const admzip = require('adm-zip')
@@ -16,7 +15,7 @@ const Idea = require('../model/idea.model')
 //CATEGORY
 
 router.get('/categories', async (req,res)=>{
-    const categories = await Category.find()
+    const categories = await Category.find().lean()
     res.render('qam/categories', {model:categories})
 })
 
@@ -40,9 +39,29 @@ router.get('/deleteCat', async (req, res) => {
     res.redirect('/qam/categories')
 })
 
+router.get('/editCat/:id', async (req, res) => {
+    const idValue = req.params.id
+    const category = await Category.findById(idValue)
+    res.render('qam/editCategory', {category:category})
+})
+
+
+router.post('/editCat', async (req, res) => {
+    let id = req.body.txtId;
+    const category = req.body.txtCategory
+    const description = req.body.txtDescription
+
+    await Category.findByIdAndUpdate(id, {$set:{
+        category: category,
+        description: description
+    }})
+
+    res.redirect('/qam/categories')
+})
+
 //DOWNLOAD CSV
 router.get('/downloadCSV', async(req, res)=>{
-    const courses = await Course.find()
+    const courses = await Course.find().lean()
     const time = new Date(Date.now())
     const timeNow = time.getTime()
 
@@ -65,16 +84,18 @@ router.get('/downloadCSV/:id', async(req, res)=>{
         for (const idea of ideas){
             if(idea.user == user._id && idea.course == course.courseName){
                 idea['user'] = user.userName
-                ideaToCSV.push(idea)
+
+                const i = {User: idea['user'], Idea: idea.idea, Course: idea.course, Category: idea.category, Date: idea.date.toLocaleString()}
+                ideaToCSV.push(i)
             }
-            console.log(idea.file)
+            
         }
     };
-
+    console.log(ideaToCSV)
     const csvData = json2csvParser(ideaToCSV);
     const filename = course.courseName
 
-    fs.writeFile(`${filename}.csv`, csvData, function(error) {
+    fs.writeFileSync(`${filename}.csv`, csvData , { encoding: 'utf8' }, function(error) {
         if (error) throw error;
         console.log("Write csv file successfully!");
     });
@@ -92,7 +113,9 @@ router.get('/downloadCSV/:id', async(req, res)=>{
             console.log('File has been Deleted');
         });
 
-    }, 3000);
+    }, 10000);
+
+    res.redirect('/qam/date')
 
 })
 
@@ -124,10 +147,10 @@ router.get('/downloadZipFile',  (req, res)=>{
 router.get('/ideaDetail/:id', async (req, res) => {
     const id = req.params.id
     const idea = await Idea.findById(id)
-    const users = await User.find()
-    const comments = await Comment.find()
-    const ratings = await Rating.find()
-    //const comments = await getCommentByIdea(id, "Comment")
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean()
+
     let commentNumber = 0
     let commentByIdea = []
     let dateShow = ""
@@ -175,76 +198,71 @@ router.get('/ideaDetail/:id', async (req, res) => {
 })
 
 router.get('/dashboard', async(req, res)=>{
-    let charts =[]
+    const courses = await Course.find()
+
+    let barChart1 =[]
+    let barChart2 =[]
+    let pieChart =[]
     
-    for(let i = 2019; i<2023; i++){
-        let IT = await getDocumentForChart("Idea", "Intelligent Technology", i)
-        let Business = await getDocumentForChart("Idea", "Business", i)
-        let Design = await getDocumentForChart("Idea", "Design", i)
-        let ITnumber = IT.length
-        let BusinessNumber = Business.length
-        let DesignNumber = Design.length
-
-        const chart = {IT:ITnumber, Business:BusinessNumber, Design:DesignNumber, Year:i}
-        charts.push(chart)
-    }
-    console.log(charts)
-    
-    const csvData = json2csvParser(charts);
-
-    fs.writeFile('./public/csv/dashboardData.csv', csvData, function(error) {
-        if (error) throw error;
-        console.log("Write csv file successfully!");
-    });
-
-    res.render('qam/quality_assurance_manager_dashboard')
-})
-
-router.get('/dashboard2', async(req, res)=>{
-    let charts =[]
-
-    for(let i = 2019; i<2023; i++){
+    for(let year = 2019; year<2023; year++){
+        let IT = await Idea.find({$and:[{department:"Intelligent Technology"},{date: {$gte: new Date(year - 1, 12, 31), $lt: new Date(year + 1,1,1)}}]})
+        let Business = await Idea.find({$and:[{department:"Business"},{date: {$gte: new Date(year - 1, 12, 31), $lt: new Date(year + 1,1,1)}}]})
+        let Design = await Idea.find({$and:[{department:"Design"},{date: {$gte: new Date(year - 1, 12, 31), $lt: new Date(year + 1,1,1)}}]})
+        
         let ITUser = new Set()
         let BusinessUser = new Set()
         let DesignUser = new Set()
-        let IT = await getDocumentForChart("Idea", "Intelligent Technology", i)
+
         for(const idea of IT){
             ITUser.add(idea.user)
         }
-        let Business = await getDocumentForChart("Idea", "Business", i)
         for(const idea of Business){
             BusinessUser.add(idea.user)
         }
-        let Design = await getDocumentForChart("Idea", "Design", i)
         for(const idea of Design){
             DesignUser.add(idea.user)
-
         }
-        let ITnumber = ITUser.size
-        let BusinessNumber = BusinessUser.size
-        let DesignNumber = DesignUser.size
 
-        const chart = {IT:ITnumber, Business:BusinessNumber, Design:DesignNumber, Year:i}
-        charts.push(chart)
+        const chart1 = {IT:IT.length, Business:Business.length, Design:Design.length, Year:year}
+        const chart2 = {IT:ITUser.size, Business:BusinessUser.size, Design:DesignUser.size, Year:year}
+        barChart1.push(chart1)
+        barChart2.push(chart2)
     }
-    console.log(charts)
-    
-    const csvData = json2csvParser(charts);
 
-    fs.writeFile('./public/csv/dashboardData.csv', csvData, function(error) {
+    for(const course of courses){
+        const chart3 = {TotalCourse: await Idea.countDocuments({course: course.courseName}), Course:course.courseName}
+        pieChart.push(chart3)
+    }
+    
+    const csvData1 = json2csvParser(barChart1);
+    const csvData2 = json2csvParser(barChart2);
+    const csvData3 = json2csvParser(pieChart);
+
+
+    fs.writeFile('./public/csv/dashboardData.csv', csvData1, function(error) {
         if (error) throw error;
         console.log("Write csv file successfully!");
     });
 
-    res.render('qam/quality_assurance_manager_dashboard')
+    fs.writeFile('./public/csv/dashboardData2.csv', csvData2, function(error) {
+        if (error) throw error;
+        console.log("Write csv file successfully!");
+    });
+
+    fs.writeFile('./public/csv/pieChart.csv', csvData3, function(error) {
+        if (error) throw error;
+        console.log("Write csv file successfully!");
+    });
+
+    res.render('qam/quality_assurance_manager_dashboard', {ideas: await Idea.countDocuments(), courses: await Course.countDocuments(), users: await User.countDocuments()})
 })
 
 //Main view all idea
 router.get('/view', async (req, res) => {
-    const ideas = await Idea.find().sort({views:-1})
-    const users = await User.find()
-    const comments = await Comment.find()
-    const ratings = await Rating.find()
+    const ideas = await Idea.find().sort({views:-1}).lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -287,10 +305,10 @@ router.get('/view', async (req, res) => {
 })
 
 router.get('/date', async (req, res) => {
-    const ideas = await Idea.find().sort({date:-1})
-    const users = await User.find()
-    const comments = await Comment.find()
-    const ratings = await Rating.find()
+    const ideas = await Idea.find().sort({date:-1}).lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean()
 
     let dateShow = ""
     for (const idea of ideas) {
@@ -334,10 +352,10 @@ router.get('/date', async (req, res) => {
 })
 
 router.get('/rating', async (req, res) => {
-    const ideas = await Idea.find()
-    const users = await User.find()
-    const comments = await Comment.find()
-    const ratings = await Rating.find()
+    const ideas = await Idea.find().lean()
+    const users = await User.find().lean()
+    const comments = await Comment.find().lean()
+    const ratings = await Rating.find().lean()
 
     let dateShow = ""
     for (const idea of ideas) {

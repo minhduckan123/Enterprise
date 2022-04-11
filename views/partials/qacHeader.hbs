@@ -15,8 +15,8 @@
     <title>Quality Assurance Coordinator</title>
 </head>
 <body>
-    <div class="jumbotron text-center text-dark bg-secondary" style="margin-bottom:0">
-        
+    <div style= "background-image: url('truong.png');background-repeat: no-repeat;height: 350px;background-size: cover;background-position: center;margin-bottom:0;" class="jumbotron text-center text-dark bg-secondary">
+        <p class="float-right text-black-50" style="margin-bottom: 0px;">Phạm Nhật Duy</p><br><br>
         <a href="/login/logout" class="float-right btn btn-dark text-white">Log out</a>
         <h1>Quality Assurance Coordinator</h1>
         <p>Academic and support</p> 
@@ -42,5 +42,38 @@
             </ul>         
         </div>  
     </nav>
+    <div class="container" style="margin-top:30px">
+        <div class="row">
+                <div class="container">
+                    <canvas id="myChart" style="width:100%;max-width:1000px"></canvas>
+                </div>
+        </div>
+    </div>
 </body>
+<script>
+    var xValues = [100,200,300,400,500,600,700,800,900,1000];
+    
+    new Chart("myChart", {
+      type: "line",
+      data: {
+        labels: xValues,
+        datasets: [{ 
+            label:" value1",
+            data: [860,1140,1060,1060,1070,1110,1330,2210,7830,2478],
+            borderColor: "red",
+            fill: false
+            }, { 
+            label:" value2",
+            data: [1600,1700,1700,1900,2000,2700,4000,5000,6000,7000],
+            borderColor: "green",
+            fill: false
+            }, { 
+            label:" value3",
+            data: [300,700,2000,5000,6000,4000,2000,1000,200,100],
+            borderColor: "blue",
+            fill: false
+        }]
+      },
+    });
+</script>
 </html>

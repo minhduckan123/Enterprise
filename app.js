@@ -66,6 +66,9 @@ app.use('/qam', authMiddleware.authLogIn, authMiddleware.isQAM, qamController)
 const qacController = require('./controller/qac')
 app.use('/qac', authMiddleware.authLogIn, authMiddleware.isQAC, qacController)
 
+app.use(function(req, res, next){
+    res.status(404).render('error', {title:'404', message:'page not found'})
+})
 
 //RUNNING APP PORT
 var PORT = process.env.PORT || 5000
